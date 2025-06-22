@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin nhắn - OmniSell</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+        }
+        
+        .gradient-shopee {
+            background: linear-gradient(135deg, #F59E0B 0%, #EE4D2D 100%);
+        }
+        
+        .gradient-facebook {
+            background: linear-gradient(135deg, #1877F2 0%, #0E5CC9 100%);
+        }
+        
+        .gradient-tiktok {
+            background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        }
+        
+        /* Sidebar animations */
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            padding-left: 28px;
+        }
+        
+        .sidebar-item.active {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            color: #3B82F6;
+        }
+        
+        /* Chat animations */
+        .chat-item {
+            transition: all 0.3s ease;
+        }
+        
+        .chat-item:hover {
+            background-color: #F3F4F6;
+        }
+        
+        .chat-item.active {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+        }
+        
+        /* Message animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message {
+            animation: slideInUp 0.3s ease;
+        }
+        
+        /* Mobile menu animation */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Typing indicator */
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: #E5E7EB;
+            border-radius: 20px;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: #6B7280;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        /* Online indicator */
+        .online-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background-color: #10B981;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        /* Scrollbar */
+        .chat-list::-webkit-scrollbar,
+        .message-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-list::-webkit-scrollbar-track,
+        .message-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .chat-list::-webkit-scrollbar-thumb,
+        .message-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        
+        /* Quick reply buttons */
+        .quick-reply {
+            transition: all 0.3s ease;
+        }
+        
+        .quick-reply:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* Attachment preview */
+        .attachment-preview {
+            transition: all 0.3s ease;
+        }
+        
+        .attachment-preview:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Notification badge */
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-40">
+        <div class="flex items-center justify-between p-4">
+            <button onclick="toggleMobileMenu()" class="text-gray-700">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-sm"></i>
+                </div>
+                <span class="text-lg font-bold text-gray-900">OmniSell</span>
+            </div>
+            <button class="relative">
+                <i class="fas fa-bell text-gray-700 text-xl"></i>
+                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:block fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-30">
+        <div class="p-6">
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+            </div>
+            
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="#" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+            
+            <div class="mt-8 pt-8 border-t">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-plug text-lg"></i>
+                    <span>Kết nối kênh</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-cog text-lg"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Sidebar -->
+    <aside id="mobileSidebar" class="lg:hidden fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-50 mobile-menu">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-store text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="text-gray-500">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="#" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileOverlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 hidden" onclick="toggleMobileMenu()"></div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 pt-16 lg:pt-0 h-screen flex flex-col">
+        <!-- Top Navigation -->
+        <nav class="hidden lg:flex items-center justify-between bg-white px-8 py-4 shadow-sm">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-semibold text-gray-900">Tin nhắn</h1>
+                <div class="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full">
+                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span class="text-sm text-gray-600">5 đang hoạt động</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-filter text-lg"></i>
+                </button>
+                <button class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+                </button>
+                <div class="flex items-center space-x-3 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop" 
+                         alt="Avatar" 
+                         class="w-10 h-10 rounded-full">
+                    <div>
+                        <p class="font-medium text-gray-900">Nguyễn Văn A</p>
+                        <p class="text-xs text-gray-500">Admin</p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Inbox Content -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Chat List Sidebar -->
+            <div class="w-full lg:w-80 bg-white border-r border-gray-200 flex flex-col">
+                <!-- Search -->
+                <div class="p-4 border-b">
+                    <div class="relative">
+                        <input type="text" 
+                               placeholder="Tìm kiếm tin nhắn..." 
+                               class="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                    <!-- Filter tabs -->
+                    <div class="flex space-x-2 mt-3">
+                        <button class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg">Tất cả</button>
+                        <button class="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">Chưa đọc</button>
+                        <button class="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i class="fab fa-shopify text-orange-600"></i>
+                        </button>
+                        <button class="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i class="fab fa-facebook text-blue-600"></i>
+                        </button>
+                        <button class="px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i class="fab fa-tiktok"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat List -->
+                <div class="flex-1 overflow-y-auto chat-list">
+                    <!-- Active Chat Item -->
+                    <div class="chat-item active p-4 cursor-pointer border-b">
+                        <div class="flex items-start space-x-3">
+                            <div class="relative">
+                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop" 
+                                     alt="Avatar" 
+                                     class="w-12 h-12 rounded-full">
+                                <span class="online-indicator"></span>
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                                    <i class="fab fa-shopify text-white text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-semibold text-gray-900">Nguyễn Thị Mai</h3>
+                                    <span class="text-xs text-gray-500">2 phút</span>
+                                </div>
+                                <p class="text-sm text-gray-600 truncate">Cho em hỏi sản phẩm này còn hàng không ạ?</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Đang trả lời</span>
+                                    <span class="text-xs text-gray-500">#SP12345</span>
+                                </div>
+                            </div>
+                            <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                        </div>
+                    </div>
+
+                    <!-- Chat Item -->
+                    <div class="chat-item p-4 cursor-pointer border-b">
+                        <div class="flex items-start space-x-3">
+                            <div class="relative">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop" 
+                                     alt="Avatar" 
+                                     class="w-12 h-12 rounded-full">
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                                    <i class="fab fa-facebook text-white text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-semibold text-gray-900">Trần Văn Nam</h3>
+                                    <span class="text-xs text-gray-500">15 phút</span>
+                                </div>
+                                <p class="text-sm text-gray-600 truncate">Ship về tỉnh được không shop?</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded">Đã trả lời</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Item with unread -->
+                    <div class="chat-item p-4 cursor-pointer border-b bg-blue-50">
+                        <div class="flex items-start space-x-3">
+                            <div class="relative">
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop" 
+                                     alt="Avatar" 
+                                     class="w-12 h-12 rounded-full">
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-900 rounded-full flex items-center justify-center">
+                                    <i class="fab fa-tiktok text-white text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-semibold text-gray-900">Lê Thị Hương</h3>
+                                    <span class="text-xs text-gray-500">30 phút</span>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900 truncate">Có màu nào khác không ạ?</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded">Chưa trả lời</span>
+                                </div>
+                            </div>
+                            <span class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">2</span>
+                        </div>
+                    </div>
+
+                    <!-- More chat items... -->
+                    <div class="chat-item p-4 cursor-pointer border-b">
+                        <div class="flex items-start space-x-3">
+                            <div class="relative">
+                                <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=50&h=50&fit=crop" 
+                                     alt="Avatar" 
+                                     class="w-12 h-12 rounded-full">
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                                    <i class="fab fa-shopify text-white text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-semibold text-gray-900">Phạm Văn Đức</h3>
+                                    <span class="text-xs text-gray-500">1 giờ</span>
+                                </div>
+                                <p class="text-sm text-gray-600 truncate">Cảm ơn shop!</p>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Đã đóng</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Window -->
+            <div class="hidden lg:flex flex-1 flex-col bg-gray-50">
+                <!-- Chat Header -->
+                <div class="bg-white px-6 py-4 shadow-sm flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop" 
+                                 alt="Avatar" 
+                                 class="w-10 h-10 rounded-full">
+                            <span class="online-indicator"></span>
+                        </div>
+                        <div>
+                            <h2 class="font-semibold text-gray-900">Nguyễn Thị Mai</h2>
+                            <div class="flex items-center space-x-2 text-sm">
+                                <i class="fab fa-shopify text-orange-600"></i>
+                                <span class="text-gray-600">Shopee • Đang hoạt động</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" onclick="toggleOrderInfo()">
+                            <i class="fas fa-info-circle text-xl"></i>
+                        </button>
+                        <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-phone text-xl"></i>
+                        </button>
+                        <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-ellipsis-v text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div class="flex-1 overflow-y-auto p-6 message-container">
+                    <!-- Date Divider -->
+                    <div class="flex items-center justify-center mb-6">
+                        <span class="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full">Hôm nay</span>
+                    </div>
+
+                    <!-- Customer Message -->
+                    <div class="flex items-start space-x-3 mb-4 message">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop" 
+                             alt="Avatar" 
+                             class="w-8 h-8 rounded-full">
+                        <div class="max-w-md">
+                            <div class="bg-white rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
+                                <p class="text-gray-800">Chào shop, cho em hỏi sản phẩm son môi A123 còn hàng không ạ?</p>
+                            </div>
+                            <span class="text-xs text-gray-500 mt-1 block">14:30</span>
+                        </div>
+                    </div>
+
+                    <!-- Shop Message -->
+                    <div class="flex items-start justify-end space-x-3 mb-4 message">
+                        <div class="max-w-md">
+                            <div class="gradient-shopee text-white rounded-2xl rounded-tr-none px-4 py-3">
+                                <p>Chào bạn! Sản phẩm son môi A123 hiện tại shop vẫn còn hàng nhé. Bạn muốn mua màu nào ạ?</p>
+                            </div>
+                            <span class="text-xs text-gray-500 mt-1 block text-right">14:32</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Message with Image -->
+                    <div class="flex items-start space-x-3 mb-4 message">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop" 
+                             alt="Avatar" 
+                             class="w-8 h-8 rounded-full">
+                        <div class="max-w-md">
+                            <div class="bg-white rounded-2xl rounded-tl-none p-2 shadow-sm">
+                                <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=200&h=150&fit=crop" 
+                                     alt="Product" 
+                                     class="rounded-lg mb-2 cursor-pointer attachment-preview">
+                                <p class="text-gray-800 px-2 pb-1">Em muốn màu này ạ, còn không?</p>
+                            </div>
+                            <span class="text-xs text-gray-500 mt-1 block">14:35</span>
+                        </div>
+                    </div>
+
+                    <!-- Typing Indicator -->
+                    <div class="flex items-start space-x-3 mb-4">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop" 
+                             alt="Shop Avatar" 
+                             class="w-8 h-8 rounded-full">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Replies -->
+                <div class="bg-white border-t px-6 py-3">
+                    <div class="flex items-center space-x-2 overflow-x-auto pb-2">
+                        <span class="text-sm text-gray-600 mr-2">Trả lời nhanh:</span>
+                        <button class="quick-reply whitespace-nowrap px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm">
+                            Còn hàng ạ
+                        </button>
+                        <button class="quick-reply whitespace-nowrap px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm">
+                            Hết hàng rồi ạ
+                        </button>
+                        <button class="quick-reply whitespace-nowrap px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm">
+                            Bạn đợi em check
+                        </button>
+                        <button class="quick-reply whitespace-nowrap px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm">
+                            <i class="fas fa-robot mr-1"></i>AI gợi ý
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="bg-white border-t px-6 py-4">
+                    <div class="flex items-end space-x-3">
+                        <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-paperclip text-xl"></i>
+                        </button>
+                        <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                            <i class="fas fa-image text-xl"></i>
+                        </button>
+                        <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" onclick="showOrderSelector()">
+                            <i class="fas fa-tag text-xl"></i>
+                        </button>
+                        <div class="flex-1 relative">
+                            <textarea 
+                                placeholder="Nhập tin nhắn..." 
+                                class="w-full px-4 py-2 bg-gray-100 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                rows="1"
+                                onkeypress="handleKeyPress(event)"></textarea>
+                        </div>
+                        <button class="p-3 gradient-shopee text-white rounded-lg hover:shadow-lg transition">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Info Sidebar (Hidden by default) -->
+            <div id="orderInfoSidebar" class="hidden w-80 bg-white border-l border-gray-200 p-6 overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold">Thông tin khách hàng</h3>
+                    <button onclick="toggleOrderInfo()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <!-- Customer Info -->
+                <div class="mb-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&h=60&fit=crop" 
+                             alt="Avatar" 
+                             class="w-16 h-16 rounded-full">
+                        <div>
+                            <h4 class="font-semibold">Nguyễn Thị Mai</h4>
+                            <p class="text-sm text-gray-600">Khách VIP</p>
+                        </div>
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Tổng đơn:</span>
+                            <span class="font-medium">15</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Tổng chi tiêu:</span>
+                            <span class="font-medium">5.2M</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Lần mua cuối:</span>
+                            <span class="font-medium">3 ngày trước</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Orders -->
+                <div>
+                    <h4 class="font-semibold mb-3">Đơn hàng gần đây</h4>
+                    <div class="space-y-3">
+                        <div class="border rounded-lg p-3 cursor-pointer hover:bg-gray-50">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-sm font-medium">#SP12345</span>
+                                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">Đã giao</span>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-1">Son môi A123 x2</p>
+                            <p class="text-sm font-medium">520,000đ</p>
+                        </div>
+                        <div class="border rounded-lg p-3 cursor-pointer hover:bg-gray-50">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-sm font-medium">#SP12089</span>
+                                <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">Đang giao</span>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-1">Kem dưỡng da B456</p>
+                            <p class="text-sm font-medium">380,000đ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-30">
+        <div class="grid grid-cols-5 gap-1">
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">Tổng quan</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs">Đơn hàng</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-blue-600">
+                <i class="fas fa-comments text-xl mb-1"></i>
+                <span class="text-xs">Tin nhắn</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-robot text-xl mb-1"></i>
+                <span class="text-xs">AI</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">Tài khoản</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Order Selector Modal -->
+    <div id="orderSelectorModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-semibold mb-4">Chọn đơn hàng để tag</h3>
+            <div class="mb-4">
+                <input type="text" 
+                       placeholder="Tìm kiếm đơn hàng..." 
+                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="space-y-2 max-h-60 overflow-y-auto">
+                <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input type="checkbox" class="mr-3">
+                    <div class="flex-1">
+                        <p class="font-medium">#SP12345</p>
+                        <p class="text-sm text-gray-600">Son môi A123 - 260,000đ</p>
+                    </div>
+                </label>
+                <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input type="checkbox" class="mr-3">
+                    <div class="flex-1">
+                        <p class="font-medium">#SP12089</p>
+                        <p class="text-sm text-gray-600">Kem dưỡng B456 - 380,000đ</p>
+                    </div>
+                </label>
+            </div>
+            <div class="flex space-x-3 mt-6">
+                <button onclick="hideOrderSelector()" class="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">
+                    Hủy
+                </button>
+                <button class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Xác nhận
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobileSidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Toggle Order Info Sidebar
+        function toggleOrderInfo() {
+            const sidebar = document.getElementById('orderInfoSidebar');
+            sidebar.classList.toggle('hidden');
+        }
+
+        // Show/Hide Order Selector Modal
+        function showOrderSelector() {
+            document.getElementById('orderSelectorModal').classList.remove('hidden');
+        }
+
+        function hideOrderSelector() {
+            document.getElementById('orderSelectorModal').classList.add('hidden');
+        }
+
+        // Handle Enter key in message input
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Send message function
+        function sendMessage() {
+            const textarea = event.target;
+            const message = textarea.value.trim();
+            
+            if (message) {
+                // Add message to chat
+                const messageContainer = document.querySelector('.message-container');
+                const newMessage = document.createElement('div');
+                newMessage.className = 'flex items-start justify-end space-x-3 mb-4 message';
+                newMessage.innerHTML = `
+                    <div class="max-w-md">
+                        <div class="gradient-shopee text-white rounded-2xl rounded-tr-none px-4 py-3">
+                            <p>${message}</p>
+                        </div>
+                        <span class="text-xs text-gray-500 mt-1 block text-right">${new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                `;
+                
+                // Remove typing indicator
+                const typingIndicator = messageContainer.querySelector('.typing-indicator')?.parentElement;
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+                
+                messageContainer.appendChild(newMessage);
+                
+                // Scroll to bottom
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+                
+                // Clear input
+                textarea.value = '';
+                textarea.style.height = 'auto';
+                
+                // Simulate response typing
+                setTimeout(() => {
+                    showTypingIndicator();
+                }, 1000);
+            }
+        }
+
+        // Show typing indicator
+        function showTypingIndicator() {
+            const messageContainer = document.querySelector('.message-container');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'flex items-start space-x-3 mb-4';
+            typingDiv.innerHTML = `
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&h=40&fit=crop" 
+                     alt="Avatar" 
+                     class="w-8 h-8 rounded-full">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            messageContainer.appendChild(typingDiv);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        // Auto-resize textarea
+        document.querySelector('textarea').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Quick reply buttons
+        document.querySelectorAll('.quick-reply').forEach(button => {
+            button.addEventListener('click', function() {
+                const textarea = document.querySelector('textarea');
+                const text = this.textContent.trim();
+                
+                if (text === 'AI gợi ý') {
+                    // Simulate AI suggestion
+                    textarea.value = 'Dạ, màu đó shop còn hàng ạ. Hiện tại còn 3 cái, bạn có muốn đặt luôn không ạ? Shop có thể giao hàng trong 2-3 ngày nhé!';
+                } else {
+                    textarea.value = text;
+                }
+                
+                textarea.focus();
+                textarea.dispatchEvent(new Event('input'));
+            });
+        });
+
+        // Simulate new messages
+        setInterval(() => {
+            const unreadBadges = document.querySelectorAll('.notification-badge');
+            unreadBadges.forEach(badge => {
+                const current = parseInt(badge.textContent);
+                if (Math.random() > 0.8) {
+                    badge.textContent = current + 1;
+                }
+            });
+        }, 30000);
+
+        // Mobile chat view toggle
+        if (window.innerWidth < 1024) {
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Show chat window on mobile
+                    alert('Mobile chat view would open here');
+                });
+            });
+        }
+    </script>
+</body>
+</html>
