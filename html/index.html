@@ -1,104 +1,119 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="OmniSell - Nền tảng bán hàng đa kênh tích hợp AI cho Shopee, TikTok Shop, Facebook. Tự động trả lời khách hàng, gợi ý sản phẩm thông minh. Dùng thử miễn phí 14 ngày.">
-    <meta name="keywords" content="bán hàng đa kênh, AI chatbot, quản lý Shopee, TikTok Shop, Facebook commerce, phần mềm bán hàng">
-    
+    <meta name="description"
+        content="OmniSell - Nền tảng bán hàng đa kênh tích hợp AI cho Shopee, TikTok Shop, Facebook. Tự động trả lời khách hàng, gợi ý sản phẩm thông minh. Dùng thử miễn phí 14 ngày.">
+    <meta name="keywords"
+        content="bán hàng đa kênh, AI chatbot, quản lý Shopee, TikTok Shop, Facebook commerce, phần mềm bán hàng">
+
     <!-- Open Graph tags -->
     <meta property="og:title" content="OmniSell - Bán hàng đa kênh thông minh với AI">
-    <meta property="og:description" content="Quản lý Shopee, TikTok Shop, Facebook trong một nền tảng. AI tự động trả lời khách và gợi ý sản phẩm.">
+    <meta property="og:description"
+        content="Quản lý Shopee, TikTok Shop, Facebook trong một nền tảng. AI tự động trả lời khách và gợi ý sản phẩm.">
     <meta property="og:image" content="/images/og-image.jpg">
     <meta property="og:url" content="https://omnisell.vn">
-    
+
     <title>OmniSell - Nền Tảng Bán Hàng Đa Kênh Tích Hợp AI</title>
-    
+
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
+
         * {
             font-family: 'Inter', sans-serif;
         }
-        
+
         .gradient-text {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         .hero-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
+
         .feature-card {
             transition: all 0.3s ease;
         }
-        
+
         .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
-        
+
         .testimonial-card {
             transition: all 0.3s ease;
         }
-        
+
         .testimonial-card:hover {
             transform: scale(1.02);
         }
-        
+
         @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
         }
-        
+
         .float-animation {
             animation: float 3s ease-in-out infinite;
         }
-        
+
         @keyframes slideInLeft {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateX(-50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
             }
         }
-        
+
         @keyframes slideInRight {
-            from { 
+            from {
                 opacity: 0;
                 transform: translateX(50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
             }
         }
-        
+
         .slide-in-left {
             animation: slideInLeft 0.8s ease-out;
         }
-        
+
         .slide-in-right {
             animation: slideInRight 0.8s ease-out;
         }
-        
+
         .stat-number {
             font-variant-numeric: tabular-nums;
         }
     </style>
 </head>
+
 <body class="bg-gray-50">
     <!-- Navigation -->
     <nav class="fixed w-full bg-white/95 backdrop-blur-sm shadow-sm z-50">
@@ -116,7 +131,8 @@
                     <a href="#testimonials" class="text-gray-700 hover:text-purple-600 transition">Khách hàng</a>
                     <a href="#pricing" class="text-gray-700 hover:text-purple-600 transition">Bảng giá</a>
                 </div>
-                <a href="login.html" class="hero-gradient text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transition">
+                <a href="login.html"
+                    class="hero-gradient text-white px-6 py-2 rounded-full font-medium hover:shadow-lg transition">
                     Dùng thử miễn phí
                 </a>
                 <button class="md:hidden text-gray-700" onclick="toggleMobileMenu()">
@@ -148,14 +164,16 @@
                         <span class="gradient-text">Thông minh với AI</span>
                     </h1>
                     <p class="text-xl text-gray-600 mb-8">
-                        Quản lý Shopee, TikTok Shop, Facebook trong một nền tảng duy nhất. 
+                        Quản lý Shopee, TikTok Shop, Facebook trong một nền tảng duy nhất.
                         AI tự động trả lời khách hàng và gợi ý sản phẩm thông minh.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 mb-8">
-                        <button class="hero-gradient text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transition">
+                        <button
+                            class="hero-gradient text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transition">
                             Dùng thử miễn phí 14 ngày
                         </button>
-                        <button class="border-2 border-purple-600 text-purple-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-purple-50 transition">
+                        <button
+                            class="border-2 border-purple-600 text-purple-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-purple-50 transition">
                             <i class="fas fa-play-circle mr-2"></i>Xem demo
                         </button>
                     </div>
@@ -172,12 +190,12 @@
                 </div>
                 <div class="slide-in-right relative">
                     <div class="float-animation">
-                        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop" 
-                             alt="Dashboard Preview" 
-                             class="rounded-2xl shadow-2xl w-full">
+                        <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop"
+                            alt="Dashboard Preview" class="rounded-2xl shadow-2xl w-full">
                     </div>
                     <!-- Floating Elements -->
-                    <div class="absolute -top-4 -right-4 bg-white rounded-xl shadow-lg p-4 float-animation" style="animation-delay: 0.5s;">
+                    <div class="absolute -top-4 -right-4 bg-white rounded-xl shadow-lg p-4 float-animation"
+                        style="animation-delay: 0.5s;">
                         <div class="flex items-center space-x-2">
                             <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
                                 <i class="fab fa-shopify text-white"></i>
@@ -188,7 +206,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4 float-animation" style="animation-delay: 1s;">
+                    <div class="absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-4 float-animation"
+                        style="animation-delay: 1s;">
                         <div class="flex items-center space-x-2">
                             <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
                                 <i class="fas fa-robot text-white"></i>
@@ -250,7 +269,7 @@
                         <li><i class="fas fa-check text-green-500 mr-2"></i>Tránh oversell</li>
                     </ul>
                 </div>
-                
+
                 <div class="feature-card bg-white rounded-2xl p-8 shadow-lg">
                     <div class="w-16 h-16 hero-gradient rounded-xl flex items-center justify-center mb-6">
                         <i class="fas fa-robot text-white text-2xl"></i>
@@ -265,7 +284,7 @@
                         <li><i class="fas fa-check text-green-500 mr-2"></i>Đa ngôn ngữ</li>
                     </ul>
                 </div>
-                
+
                 <div class="feature-card bg-white rounded-2xl p-8 shadow-lg">
                     <div class="w-16 h-16 hero-gradient rounded-xl flex items-center justify-center mb-6">
                         <i class="fas fa-brain text-white text-2xl"></i>
@@ -297,41 +316,47 @@
                     </p>
                     <div class="space-y-6">
                         <div class="flex items-start">
-                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                            <div
+                                class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
                                 <i class="fas fa-chart-line text-purple-600"></i>
                             </div>
                             <div>
                                 <h4 class="text-lg font-semibold mb-2">Báo cáo thời gian thực</h4>
-                                <p class="text-gray-600">Theo dõi doanh thu, đơn hàng, khách hàng từ tất cả kênh trong một dashboard.</p>
+                                <p class="text-gray-600">Theo dõi doanh thu, đơn hàng, khách hàng từ tất cả kênh trong
+                                    một dashboard.</p>
                             </div>
                         </div>
                         <div class="flex items-start">
-                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                            <div
+                                class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
                                 <i class="fas fa-comments text-purple-600"></i>
                             </div>
                             <div>
                                 <h4 class="text-lg font-semibold mb-2">Chat tập trung</h4>
-                                <p class="text-gray-600">Trả lời tin nhắn từ Shopee, TikTok, Facebook trong cùng một giao diện.</p>
+                                <p class="text-gray-600">Trả lời tin nhắn từ Shopee, TikTok, Facebook trong cùng một
+                                    giao diện.</p>
                             </div>
                         </div>
                         <div class="flex items-start">
-                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                            <div
+                                class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
                                 <i class="fas fa-box text-purple-600"></i>
                             </div>
                             <div>
                                 <h4 class="text-lg font-semibold mb-2">Quản lý kho thông minh</h4>
-                                <p class="text-gray-600">Tự động cập nhật tồn kho, cảnh báo hết hàng, đề xuất nhập hàng.</p>
+                                <p class="text-gray-600">Tự động cập nhật tồn kho, cảnh báo hết hàng, đề xuất nhập hàng.
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="relative">
                     <div class="bg-gray-100 rounded-2xl p-8 relative">
-                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop" 
-                             alt="Dashboard Demo" 
-                             class="rounded-lg shadow-xl w-full">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
+                            alt="Dashboard Demo" class="rounded-lg shadow-xl w-full">
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <button class="bg-white/90 backdrop-blur-sm rounded-full w-20 h-20 flex items-center justify-center shadow-lg hover:scale-110 transition">
+                            <button
+                                class="bg-white/90 backdrop-blur-sm rounded-full w-20 h-20 flex items-center justify-center shadow-lg hover:scale-110 transition">
                                 <i class="fas fa-play text-purple-600 text-2xl ml-1"></i>
                             </button>
                         </div>
@@ -351,9 +376,8 @@
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="testimonial-card bg-white rounded-2xl p-8 shadow-lg">
                     <div class="flex items-center mb-6">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&h=60&fit=crop" 
-                             alt="Customer" 
-                             class="w-16 h-16 rounded-full mr-4">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&h=60&fit=crop"
+                            alt="Customer" class="w-16 h-16 rounded-full mr-4">
                         <div>
                             <h4 class="font-semibold">Nguyễn Thị Mai</h4>
                             <p class="text-gray-600 text-sm">Shop Mỹ phẩm Mai Xinh</p>
@@ -367,15 +391,15 @@
                         <i class="fas fa-star text-yellow-400"></i>
                     </div>
                     <p class="text-gray-700">
-                        "Từ khi dùng OmniSell, tôi tiết kiệm được 4 giờ mỗi ngày. AI chatbot trả lời khách cực kỳ thông minh, doanh thu tăng 40%!"
+                        "Từ khi dùng OmniSell, tôi tiết kiệm được 4 giờ mỗi ngày. AI chatbot trả lời khách cực kỳ thông
+                        minh, doanh thu tăng 40%!"
                     </p>
                 </div>
-                
+
                 <div class="testimonial-card bg-white rounded-2xl p-8 shadow-lg">
                     <div class="flex items-center mb-6">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop" 
-                             alt="Customer" 
-                             class="w-16 h-16 rounded-full mr-4">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&h=60&fit=crop"
+                            alt="Customer" class="w-16 h-16 rounded-full mr-4">
                         <div>
                             <h4 class="font-semibold">Trần Văn Nam</h4>
                             <p class="text-gray-600 text-sm">Nam Fashion Store</p>
@@ -389,15 +413,15 @@
                         <i class="fas fa-star text-yellow-400"></i>
                     </div>
                     <p class="text-gray-700">
-                        "Quản lý 3 kênh bán hàng chưa bao giờ dễ dàng đến vậy. Tính năng đồng bộ kho giúp tôi tránh được việc bán quá số lượng."
+                        "Quản lý 3 kênh bán hàng chưa bao giờ dễ dàng đến vậy. Tính năng đồng bộ kho giúp tôi tránh được
+                        việc bán quá số lượng."
                     </p>
                 </div>
-                
+
                 <div class="testimonial-card bg-white rounded-2xl p-8 shadow-lg">
                     <div class="flex items-center mb-6">
-                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop" 
-                             alt="Customer" 
-                             class="w-16 h-16 rounded-full mr-4">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop"
+                            alt="Customer" class="w-16 h-16 rounded-full mr-4">
                         <div>
                             <h4 class="font-semibold">Lê Thị Hương</h4>
                             <p class="text-gray-600 text-sm">Hương Beauty Shop</p>
@@ -411,7 +435,8 @@
                         <i class="fas fa-star text-yellow-400"></i>
                     </div>
                     <p class="text-gray-700">
-                        "AI Agent gợi ý sản phẩm cực kỳ chính xác. Khách hàng rất hài lòng và tỷ lệ mua hàng tăng đáng kể. Highly recommended!"
+                        "AI Agent gợi ý sản phẩm cực kỳ chính xác. Khách hàng rất hài lòng và tỷ lệ mua hàng tăng đáng
+                        kể. Highly recommended!"
                     </p>
                 </div>
             </div>
@@ -425,18 +450,22 @@
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">Bảng giá đơn giản, minh bạch</h2>
                 <p class="text-xl text-gray-600 mb-8">Chọn gói phù hợp với quy mô kinh doanh của bạn</p>
                 <div class="inline-flex items-center bg-gray-100 rounded-full p-1">
-                    <button id="monthlyBtn" class="px-6 py-2 rounded-full font-medium text-gray-700 transition" onclick="togglePricing('monthly')">
+                    <button id="monthlyBtn" class="px-6 py-2 rounded-full font-medium text-gray-700 transition"
+                        onclick="togglePricing('monthly')">
                         Thanh toán tháng
                     </button>
-                    <button id="yearlyBtn" class="px-6 py-2 rounded-full font-medium bg-white text-gray-900 shadow-sm transition" onclick="togglePricing('yearly')">
+                    <button id="yearlyBtn"
+                        class="px-6 py-2 rounded-full font-medium bg-white text-gray-900 shadow-sm transition"
+                        onclick="togglePricing('yearly')">
                         Thanh toán năm <span class="text-green-600 text-sm">-20%</span>
                     </button>
                 </div>
             </div>
-            
+
             <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 <!-- Starter Plan -->
-                <div class="pricing-card bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-purple-200 transition-all hover:shadow-xl">
+                <div
+                    class="pricing-card bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-purple-200 transition-all hover:shadow-xl">
                     <div class="mb-8">
                         <h3 class="text-2xl font-bold mb-2">Starter</h3>
                         <p class="text-gray-600">Cho shop mới bắt đầu</p>
@@ -480,14 +509,17 @@
                             <span>AI Agent gợi ý sản phẩm</span>
                         </li>
                     </ul>
-                    <button class="w-full py-3 px-6 border-2 border-purple-600 text-purple-600 rounded-full font-semibold hover:bg-purple-50 transition">
+                    <button
+                        class="w-full py-3 px-6 border-2 border-purple-600 text-purple-600 rounded-full font-semibold hover:bg-purple-50 transition">
                         Dùng thử 14 ngày
                     </button>
                 </div>
 
                 <!-- Professional Plan -->
-                <div class="pricing-card bg-gradient-to-b from-purple-50 to-white rounded-2xl p-8 border-2 border-purple-500 relative transform hover:scale-105 transition-all shadow-xl">
-                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-1 rounded-full text-sm font-medium">
+                <div
+                    class="pricing-card bg-gradient-to-b from-purple-50 to-white rounded-2xl p-8 border-2 border-purple-500 relative transform hover:scale-105 transition-all shadow-xl">
+                    <div
+                        class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-1 rounded-full text-sm font-medium">
                         PHỔ BIẾN NHẤT
                     </div>
                     <div class="mb-8">
@@ -533,13 +565,15 @@
                             <span>Hỗ trợ ưu tiên 24/7</span>
                         </li>
                     </ul>
-                    <button class="w-full py-3 px-6 hero-gradient text-white rounded-full font-semibold hover:shadow-lg transition">
+                    <button
+                        class="w-full py-3 px-6 hero-gradient text-white rounded-full font-semibold hover:shadow-lg transition">
                         Dùng thử 14 ngày
                     </button>
                 </div>
 
                 <!-- Enterprise Plan -->
-                <div class="pricing-card bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-purple-200 transition-all hover:shadow-xl">
+                <div
+                    class="pricing-card bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-purple-200 transition-all hover:shadow-xl">
                     <div class="mb-8">
                         <h3 class="text-2xl font-bold mb-2">Enterprise</h3>
                         <p class="text-gray-600">Cho doanh nghiệp lớn</p>
@@ -576,7 +610,8 @@
                             <span><strong>Account manager</strong> riêng</span>
                         </li>
                     </ul>
-                    <button class="w-full py-3 px-6 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-800 transition">
+                    <button
+                        class="w-full py-3 px-6 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-800 transition">
                         Liên hệ tư vấn
                     </button>
                 </div>
@@ -584,10 +619,11 @@
 
             <!-- Feature comparison -->
             <div class="mt-16 text-center">
-                <button class="text-purple-600 font-medium hover:text-purple-700 transition" onclick="toggleComparison()">
+                <button class="text-purple-600 font-medium hover:text-purple-700 transition"
+                    onclick="toggleComparison()">
                     <i class="fas fa-chevron-down mr-2"></i>So sánh chi tiết các gói
                 </button>
-                
+
                 <div id="comparisonTable" class="hidden mt-8">
                     <div class="overflow-x-auto">
                         <table class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
@@ -647,30 +683,36 @@
                 <h3 class="text-2xl font-bold text-center mb-8">Câu hỏi thường gặp</h3>
                 <div class="space-y-4">
                     <div class="bg-gray-50 rounded-xl p-6">
-                        <button class="w-full text-left flex justify-between items-center font-semibold" onclick="toggleFAQ(1)">
+                        <button class="w-full text-left flex justify-between items-center font-semibold"
+                            onclick="toggleFAQ(1)">
                             <span>Tôi có thể thay đổi gói dịch vụ không?</span>
                             <i class="fas fa-chevron-down transition-transform" id="faq-icon-1"></i>
                         </button>
                         <div class="hidden mt-4 text-gray-600" id="faq-content-1">
-                            Có, bạn có thể nâng cấp hoặc hạ cấp gói dịch vụ bất cứ lúc nào. Hệ thống sẽ tự động tính toán và điều chỉnh chi phí theo tỷ lệ thời gian sử dụng.
+                            Có, bạn có thể nâng cấp hoặc hạ cấp gói dịch vụ bất cứ lúc nào. Hệ thống sẽ tự động tính
+                            toán và điều chỉnh chi phí theo tỷ lệ thời gian sử dụng.
                         </div>
                     </div>
                     <div class="bg-gray-50 rounded-xl p-6">
-                        <button class="w-full text-left flex justify-between items-center font-semibold" onclick="toggleFAQ(2)">
+                        <button class="w-full text-left flex justify-between items-center font-semibold"
+                            onclick="toggleFAQ(2)">
                             <span>Có phí ẩn nào không?</span>
                             <i class="fas fa-chevron-down transition-transform" id="faq-icon-2"></i>
                         </button>
                         <div class="hidden mt-4 text-gray-600" id="faq-content-2">
-                            Không, chúng tôi cam kết minh bạch 100%. Giá bạn thấy là tất cả những gì bạn phải trả. Không có phí setup, phí giao dịch hay bất kỳ chi phí ẩn nào.
+                            Không, chúng tôi cam kết minh bạch 100%. Giá bạn thấy là tất cả những gì bạn phải trả. Không
+                            có phí setup, phí giao dịch hay bất kỳ chi phí ẩn nào.
                         </div>
                     </div>
                     <div class="bg-gray-50 rounded-xl p-6">
-                        <button class="w-full text-left flex justify-between items-center font-semibold" onclick="toggleFAQ(3)">
+                        <button class="w-full text-left flex justify-between items-center font-semibold"
+                            onclick="toggleFAQ(3)">
                             <span>Dữ liệu của tôi có an toàn không?</span>
                             <i class="fas fa-chevron-down transition-transform" id="faq-icon-3"></i>
                         </button>
                         <div class="hidden mt-4 text-gray-600" id="faq-content-3">
-                            Tuyệt đối an toàn. Chúng tôi sử dụng mã hóa SSL 256-bit, tuân thủ GDPR và có chứng chỉ ISO 27001. Dữ liệu được backup hàng ngày và lưu trữ trên AWS.
+                            Tuyệt đối an toàn. Chúng tôi sử dụng mã hóa SSL 256-bit, tuân thủ GDPR và có chứng chỉ ISO
+                            27001. Dữ liệu được backup hàng ngày và lưu trữ trên AWS.
                         </div>
                     </div>
                 </div>
@@ -689,7 +731,8 @@
                     Tham gia cùng 5000+ người bán đang sử dụng OmniSell để phát triển kinh doanh online
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <button class="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transition">
+                    <button
+                        class="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold text-lg hover:shadow-xl transition">
                         Dùng thử miễn phí 14 ngày
                     </button>
                     <div class="text-white/80">
@@ -755,13 +798,16 @@
                 <div>
                     <h4 class="font-semibold mb-4">Theo dõi chúng tôi</h4>
                     <div class="flex space-x-4 mb-4">
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition">
+                        <a href="#"
+                            class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition">
+                        <a href="#"
+                            class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition">
                             <i class="fab fa-youtube"></i>
                         </a>
-                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition">
+                        <a href="#"
+                            class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gray-700 transition">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
                     </div>
@@ -806,7 +852,7 @@
             rootMargin: '0px 0px -100px 0px'
         };
 
-        const observer = new IntersectionObserver(function(entries) {
+        const observer = new IntersectionObserver(function (entries) {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.style.opacity = '1';
@@ -828,7 +874,7 @@
             let start = 0;
             const increment = target / (duration / 16);
             const isPercentage = element.textContent.includes('%');
-            
+
             const timer = setInterval(() => {
                 start += increment;
                 if (start >= target) {
@@ -840,7 +886,7 @@
         }
 
         // Trigger counter animation when stats section is in view
-        const statsObserver = new IntersectionObserver(function(entries) {
+        const statsObserver = new IntersectionObserver(function (entries) {
             entries.forEach(entry => {
                 if (entry.isIntersecting && !entry.target.dataset.animated) {
                     entry.target.dataset.animated = 'true';
@@ -879,13 +925,13 @@
             const yearlyBtn = document.getElementById('yearlyBtn');
             const monthlyPrices = document.querySelectorAll('.monthly-price');
             const yearlyPrices = document.querySelectorAll('.yearly-price');
-            
+
             if (type === 'monthly') {
                 monthlyBtn.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
                 monthlyBtn.classList.remove('text-gray-700');
                 yearlyBtn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
                 yearlyBtn.classList.add('text-gray-700');
-                
+
                 monthlyPrices.forEach(el => el.classList.remove('hidden'));
                 yearlyPrices.forEach(el => el.classList.add('hidden'));
             } else {
@@ -893,7 +939,7 @@
                 yearlyBtn.classList.remove('text-gray-700');
                 monthlyBtn.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
                 monthlyBtn.classList.add('text-gray-700');
-                
+
                 yearlyPrices.forEach(el => el.classList.remove('hidden'));
                 monthlyPrices.forEach(el => el.classList.add('hidden'));
             }
@@ -909,7 +955,7 @@
         function toggleFAQ(id) {
             const content = document.getElementById(`faq-content-${id}`);
             const icon = document.getElementById(`faq-icon-${id}`);
-            
+
             content.classList.toggle('hidden');
             icon.classList.toggle('rotate-180');
         }
@@ -923,4 +969,5 @@
         });
     </script>
 </body>
+
 </html>
