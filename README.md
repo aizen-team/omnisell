@@ -38,3 +38,6 @@ npm run start:dev
 cd ../frontend
 npm install
 npm run dev
+
+## Database ERD
+https://dbdocs.io/trieunb/OmniSell-ERD

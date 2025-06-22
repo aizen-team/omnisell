@@ -1,0 +1,298 @@
+Project omni_sell { database_type: 'PostgreSQL' }
+
+Table users {
+  email varchar(255)
+  password_hash varchar(255)
+  full_name varchar(100)
+  phone varchar(20)
+  avatar_url text
+  is_active BOOLEAN
+  last_login_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table roles {
+  name varchar(50)
+  description text
+  permissions JSONB
+  created_at timestamp
+}
+
+Table user_roles {
+  assigned_at timestamp
+}
+
+Table subscription_plans {
+  name varchar(100)
+  code varchar(50)
+  price_monthly DECIMAL(12,2)
+  price_yearly DECIMAL(12,2)
+  features JSONB
+  limits JSONB
+  is_active BOOLEAN
+  created_at timestamp
+}
+
+Table shops {
+  name varchar(255)
+  slug varchar(255)
+  description text
+  logo_url text
+  subscription_expires_at timestamp
+  settings JSONB
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table products {
+  sku varchar(100)
+  name varchar(255)
+  description text
+  base_price DECIMAL(12,2)
+  cost_price DECIMAL(12,2)
+  weight DECIMAL(10,3)
+  dimensions JSONB
+  attributes JSONB
+  tags text[]
+  is_active BOOLEAN
+  created_at timestamp
+  updated_at timestamp
+  UNIQUE(shop_id, SKU)
+}
+
+Table product_variants {
+  sku_variant varchar(100)
+  name varchar(255)
+  attributes JSONB
+  price DECIMAL(12,2)
+  compare_price DECIMAL(12,2)
+  barcode varchar(100)
+  created_at timestamp
+}
+
+Table product_images {
+  url text
+  alt_text varchar(255)
+  position INTEGER
+  is_primary BOOLEAN
+  created_at timestamp
+}
+
+Table sales_channels {
+  code varchar(50)
+  name varchar(100)
+  icon_url text
+  is_active BOOLEAN
+  api_config JSONB
+}
+
+Table shop_channel_connections {
+  external_shop_id varchar(255)
+  external_shop_name varchar(255)
+  credentials JSONB
+  webhook_secret varchar(255)
+  is_active BOOLEAN
+  last_sync_at timestamp
+  sync_settings JSONB
+  connected_at timestamp
+  UNIQUE(shop_id, CHANNEL_ID)
+}
+
+Table channel_products {
+  external_product_id varchar(255)
+  external_variant_id varchar(255)
+  channel_price DECIMAL(12,2)
+  channel_stock INTEGER
+  channel_data JSONB
+  sync_status varchar(20)
+  last_sync_at timestamp
+  created_at timestamp
+  UNIQUE(connection_id, EXTERNAL_PRODUCT_ID)
+}
+
+Table orders {
+  external_order_id varchar(255)
+  order_number varchar(100)
+  status varchar(20)
+  payment_status varchar(20)
+  subtotal DECIMAL(12,2)
+  shipping_fee DECIMAL(12,2)
+  discount_amount DECIMAL(12,2)
+  total_amount DECIMAL(12,2)
+  currency varchar(3)
+  customer_info JSONB
+  shipping_info JSONB
+  channel_data JSONB
+  notes text
+  ordered_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table order_items {
+  external_product_id varchar(255)
+  product_name varchar(255)
+  variant_name varchar(255)
+  quantity INTEGER
+  unit_price DECIMAL(12,2)
+  discount_amount DECIMAL(12,2)
+  total_price DECIMAL(12,2)
+  attributes JSONB
+}
+
+Table order_status_history {
+  from_status varchar(50)
+  to_status varchar(50)
+  reason text
+  metadata JSONB
+  created_at timestamp
+}
+
+Table warehouses {
+  name varchar(255)
+  code varchar(50)
+  address text
+  is_default BOOLEAN
+  is_active BOOLEAN
+  created_at timestamp
+}
+
+Table inventory {
+  quantity_on_hand INTEGER
+  quantity_available INTEGER
+  quantity_reserved INTEGER
+  reorder_point INTEGER
+  reorder_quantity INTEGER
+  updated_at timestamp
+  UNIQUE(warehouse_id, PRODUCT_ID,
+}
+
+Table inventory_transactions {
+  type varchar(20)
+  reason varchar(100)
+  reference_type varchar(50)
+  reference_id uuid
+  quantity INTEGER
+  unit_cost DECIMAL(12,2)
+  balance_after INTEGER
+  notes text
+  created_at timestamp
+}
+
+Table conversations {
+  external_conversation_id varchar(255)
+  customer_external_id varchar(255)
+  customer_name varchar(255)
+  customer_avatar text
+  customer_info JSONB
+  status varchar(20)
+  unread_count INTEGER
+  last_message_at timestamp
+  tags text[]
+  created_at timestamp
+  updated_at timestamp
+  UNIQUE(connection_id, EXTERNAL_CONVERSATION_ID)
+}
+
+Table messages {
+  external_message_id varchar(255)
+  sender_type varchar(20)
+  sender_id varchar(255)
+  content text
+  attachments JSONB
+  is_read BOOLEAN
+  ai_suggested BOOLEAN
+  ai_confidence DECIMAL(3,2)
+  channel_data JSONB
+  sent_at timestamp
+  created_at timestamp
+}
+
+Table message_templates {
+  name varchar(255)
+  category varchar(100)
+  content text
+  variables text[]
+  usage_count INTEGER
+  is_active BOOLEAN
+  created_at timestamp
+}
+
+Table ai_agents {
+  name varchar(255)
+  type varchar(50)
+  model_config JSONB
+  knowledge_base JSONB
+  is_active BOOLEAN
+  created_at timestamp
+}
+
+Table ai_interactions {
+  reference_type varchar(50)
+  reference_id uuid
+  input_data JSONB
+  output_data JSONB
+  confidence_score DECIMAL(3,2)
+  tokens_used INTEGER
+  response_time_ms INTEGER
+  feedback varchar(20)
+  created_at timestamp
+}
+
+Table analytics_events {
+  event_type varchar(100)
+  event_data JSONB
+  session_id varchar(255)
+  ip_address INET
+  user_agent text
+  created_at timestamp
+}
+
+Table shop_subscriptions {
+  status varchar(20)
+  billing_cycle varchar(20)
+  current_period_start timestamp
+  current_period_end timestamp
+  cancel_at_period_end BOOLEAN
+  trial_ends_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table usage_tracking {
+  metric_type varchar(50)
+  usage_value BIGINT
+  period_start DATE
+  period_end DATE
+  created_at timestamp
+  UNIQUE(shop_id, METRIC_TYPE,
+}
+
+Table webhooks {
+  url text
+  events text[]
+  secret_key varchar(255)
+  is_active BOOLEAN
+  last_triggered_at timestamp
+  failure_count INTEGER
+  created_at timestamp
+}
+
+Table webhook_logs {
+  event_type varchar(100)
+  payload JSONB
+  response_status INTEGER
+  response_body text
+  duration_ms INTEGER
+  created_at timestamp
+}
+
+Table system_logs {
+  level varchar(20)
+  category varchar(100)
+  message text
+  context JSONB
+  stack_trace text
+  created_at timestamp
+}
