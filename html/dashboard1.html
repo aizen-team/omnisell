@@ -120,31 +120,6 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
-        
-        /* Dropdown animations */
-        .dropdown-menu {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-        }
-        
-        .dropdown-menu.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            z-index: 9999;
-        }
-        
-        /* Notification item hover */
-        .notification-item:hover {
-            background-color: #F9FAFB;
-        }
-        
-        /* User menu item hover */
-        .user-menu-item:hover {
-            background-color: #F3F4F6;
-        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -160,7 +135,7 @@
                 </div>
                 <span class="text-lg font-bold text-gray-900">OmniSell</span>
             </div>
-            <button class="relative" onclick="toggleNotificationDropdown('mobile')">
+            <button class="relative">
                 <i class="fas fa-bell text-gray-700 text-xl"></i>
                 <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
             </button>
@@ -239,33 +214,33 @@
             </div>
             
             <nav class="space-y-1">
-                <a href="dashboard.html" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                <a href="#" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
                     <i class="fas fa-home text-lg"></i>
                     <span>Tổng quan</span>
                 </a>
-                <a href="orders.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
                     <i class="fas fa-shopping-cart text-lg"></i>
                     <span>Đơn hàng</span>
                     <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
                 </a>
-                <a href="products.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
                     <i class="fas fa-box text-lg"></i>
                     <span>Sản phẩm</span>
                 </a>
-                <a href="chat.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
                     <i class="fas fa-comments text-lg"></i>
                     <span>Tin nhắn</span>
                     <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
                 </a>
-                <a href="warehouse.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
                     <i class="fas fa-warehouse text-lg"></i>
                     <span>Kho hàng</span>
                 </a>
-                <a href="ai-assistant.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
                     <i class="fas fa-robot text-lg"></i>
                     <span>AI Assistant</span>
                 </a>
-                <a href="reports.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
                     <i class="fas fa-chart-line text-lg"></i>
                     <span>Báo cáo</span>
                 </a>
@@ -288,111 +263,17 @@
                 <button class="gradient-primary text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition">
                     <i class="fas fa-plus mr-2"></i>Kết nối kênh mới
                 </button>
-                
-                <!-- Notification Dropdown -->
-                <div class="relative">
-                    <button onclick="toggleNotificationDropdown('desktop')" class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
-                        <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
-                    </button>
-                    <div id="notificationDropdown" class="dropdown-menu absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100">
-                        <div class="p-4 border-b border-gray-100">
-                            <h3 class="text-lg font-semibold text-gray-900">Thông báo</h3>
-                        </div>
-                        <div class="max-h-96 overflow-y-auto">
-                            <!-- Notification Item -->
-                            <div class="notification-item p-4 border-b border-gray-50 cursor-pointer">
-                                <div class="flex items-start space-x-3">
-                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-check text-green-600"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">Đơn hàng #SP12345 đã được giao thành công</p>
-                                        <p class="text-xs text-gray-500 mt-1">5 phút trước</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Notification Item -->
-                            <div class="notification-item p-4 border-b border-gray-50 cursor-pointer">
-                                <div class="flex items-start space-x-3">
-                                    <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-exclamation text-yellow-600"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">Cảnh báo: Sản phẩm "Son môi A123" sắp hết hàng</p>
-                                        <p class="text-xs text-gray-500 mt-1">1 giờ trước</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Notification Item -->
-                            <div class="notification-item p-4 border-b border-gray-50 cursor-pointer">
-                                <div class="flex items-start space-x-3">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-comment text-blue-600"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium text-gray-900">Tin nhắn mới từ khách hàng trên Shopee</p>
-                                        <p class="text-xs text-gray-500 mt-1">2 giờ trước</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-3 border-t border-gray-100">
-                            <a href="#" class="block text-center text-sm text-blue-600 hover:text-blue-700 font-medium">
-                                Xem tất cả thông báo
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- User Dropdown -->
-                <div class="relative">
-                    <div onclick="toggleUserDropdown()" class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 rounded-lg p-2 transition">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop" 
-                             alt="Avatar" 
-                             class="w-10 h-10 rounded-full">
-                        <div>
-                            <p class="font-medium text-gray-900">Nguyễn Văn A</p>
-                            <p class="text-xs text-gray-500">Admin</p>
-                        </div>
-                        <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
-                    </div>
-                    <div id="userDropdown" class="dropdown-menu absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-100">
-                        <div class="p-4 border-b border-gray-100">
-                            <div class="flex items-center space-x-3">
-                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop" 
-                                     alt="Avatar" 
-                                     class="w-12 h-12 rounded-full">
-                                <div>
-                                    <p class="font-semibold text-gray-900">Nguyễn Văn A</p>
-                                    <p class="text-sm text-gray-500">admin@omnisell.vn</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="py-2">
-                            <a href="#" class="user-menu-item flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition">
-                                <i class="fas fa-user text-gray-400 w-5"></i>
-                                <span>Thông tin cá nhân</span>
-                            </a>
-                            <a href="#" class="user-menu-item flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition">
-                                <i class="fas fa-store text-gray-400 w-5"></i>
-                                <span>Cài đặt cửa hàng</span>
-                            </a>
-                            <a href="#" class="user-menu-item flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition">
-                                <i class="fas fa-credit-card text-gray-400 w-5"></i>
-                                <span>Thanh toán & Gói dịch vụ</span>
-                            </a>
-                            <a href="#" class="user-menu-item flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition">
-                                <i class="fas fa-question-circle text-gray-400 w-5"></i>
-                                <span>Trợ giúp</span>
-                            </a>
-                        </div>
-                        <div class="py-2 border-t border-gray-100">
-                            <a href="#" class="user-menu-item flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50 transition">
-                                <i class="fas fa-sign-out-alt text-red-500 w-5"></i>
-                                <span>Đăng xuất</span>
-                            </a>
-                        </div>
+                <button class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+                </button>
+                <div class="flex items-center space-x-3 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop" 
+                         alt="Avatar" 
+                         class="w-10 h-10 rounded-full">
+                    <div>
+                        <p class="font-medium text-gray-900">Nguyễn Văn A</p>
+                        <p class="text-xs text-gray-500">Admin</p>
                     </div>
                 </div>
             </div>
@@ -663,50 +544,6 @@
             sidebar.classList.toggle('open');
             overlay.classList.toggle('hidden');
         }
-
-        // Toggle Notification Dropdown
-        function toggleNotificationDropdown(type) {
-            const dropdown = document.getElementById('notificationDropdown');
-            const userDropdown = document.getElementById('userDropdown');
-            
-            // Close user dropdown if open
-            if (userDropdown && userDropdown.classList.contains('show')) {
-                userDropdown.classList.remove('show');
-            }
-            
-            if (dropdown) {
-                dropdown.classList.toggle('show');
-            }
-        }
-
-        // Toggle User Dropdown
-        function toggleUserDropdown() {
-            const dropdown = document.getElementById('userDropdown');
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            
-            // Close notification dropdown if open
-            if (notificationDropdown && notificationDropdown.classList.contains('show')) {
-                notificationDropdown.classList.remove('show');
-            }
-            
-            dropdown.classList.toggle('show');
-        }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            const userDropdown = document.getElementById('userDropdown');
-            
-            // Check if click is outside notification dropdown
-            if (notificationDropdown && !event.target.closest('.relative') && !event.target.closest('#notificationDropdown')) {
-                notificationDropdown.classList.remove('show');
-            }
-            
-            // Check if click is outside user dropdown
-            if (userDropdown && !event.target.closest('.relative') && !event.target.closest('#userDropdown')) {
-                userDropdown.classList.remove('show');
-            }
-        });
 
         // Revenue Chart
         const ctx = document.getElementById('revenueChart').getContext('2d');

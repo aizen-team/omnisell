@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sản phẩm - OmniSell</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+        }
+        
+        /* Sidebar animations */
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            padding-left: 28px;
+        }
+        
+        .sidebar-item.active {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            color: #3B82F6;
+        }
+        
+        /* Table row hover */
+        .table-row {
+            transition: all 0.2s ease;
+        }
+        
+        .table-row:hover {
+            background-color: #F9FAFB;
+            transform: translateX(4px);
+        }
+        
+        .table-row:hover .row-actions {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .row-actions {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+        
+        /* Mobile menu animation */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Channel badges */
+        .channel-badge {
+            transition: all 0.2s ease;
+        }
+        
+        .channel-badge:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Modal animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-content {
+            animation: slideIn 0.3s ease;
+        }
+        
+        /* Switch toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #3B82F6;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* Loading skeleton */
+        @keyframes skeleton {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton 1.5s infinite;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        
+        /* Image preview */
+        .image-preview {
+            transition: all 0.3s ease;
+        }
+        
+        .image-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Variant row */
+        .variant-row {
+            transition: all 0.3s ease;
+        }
+        
+        .variant-row:hover {
+            background-color: #F3F4F6;
+        }
+        
+        /* Notification badge */
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-40">
+        <div class="flex items-center justify-between p-4">
+            <button onclick="toggleMobileMenu()" class="text-gray-700">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-sm"></i>
+                </div>
+                <span class="text-lg font-bold text-gray-900">OmniSell</span>
+            </div>
+            <button class="relative">
+                <i class="fas fa-bell text-gray-700 text-xl"></i>
+                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:block fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-30">
+        <div class="p-6">
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+            </div>
+            
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="#" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+            
+            <div class="mt-8 pt-8 border-t">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-plug text-lg"></i>
+                    <span>Kết nối kênh</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-cog text-lg"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Sidebar -->
+    <aside id="mobileSidebar" class="lg:hidden fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-50 mobile-menu">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-store text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="text-gray-500">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="#" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileOverlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 hidden" onclick="toggleMobileMenu()"></div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 pt-16 lg:pt-0">
+        <!-- Top Navigation -->
+        <nav class="hidden lg:flex items-center justify-between bg-white px-8 py-4 shadow-sm">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-semibold text-gray-900">Quản lý sản phẩm</h1>
+                <span class="text-gray-500">156 sản phẩm</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="showAddProductModal()" class="gradient-primary text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition">
+                    <i class="fas fa-plus mr-2"></i>Thêm sản phẩm
+                </button>
+                <button class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+                </button>
+                <div class="flex items-center space-x-3 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop" 
+                         alt="Avatar" 
+                         class="w-10 h-10 rounded-full">
+                    <div>
+                        <p class="font-medium text-gray-900">Nguyễn Văn A</p>
+                        <p class="text-xs text-gray-500">Admin</p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Product Management Content -->
+        <div class="p-4 lg:p-8">
+            <!-- Search and Filter Bar -->
+            <div class="bg-white rounded-xl p-4 shadow-sm mb-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div class="flex-1 max-w-md">
+                        <div class="relative">
+                            <input type="text" 
+                                   placeholder="Tìm kiếm sản phẩm..." 
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>Tất cả kênh</option>
+                            <option>Shopee</option>
+                            <option>TikTok Shop</option>
+                            <option>Facebook</option>
+                        </select>
+                        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>Tất cả trạng thái</option>
+                            <option>Đang bán</option>
+                            <option>Hết hàng</option>
+                            <option>Ẩn</option>
+                        </select>
+                        <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            <i class="fas fa-filter mr-2"></i>Lọc nâng cao
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Table - Desktop -->
+            <div class="hidden lg:block bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-6 py-4 text-left">
+                                    <input type="checkbox" class="rounded">
+                                </th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Sản phẩm</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Giá bán</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Tồn kho</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Kênh bán</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Trạng thái</th>
+                                <th class="px-6 py-4 text-center text-sm font-medium text-gray-700">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <!-- Product Row 1 -->
+                            <tr class="table-row">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" class="rounded">
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=50&h=50&fit=crop" 
+                                             alt="Product" 
+                                             class="w-12 h-12 rounded-lg object-cover image-preview cursor-pointer">
+                                        <div>
+                                            <p class="font-medium text-gray-900">Son môi cao cấp A123</p>
+                                            <p class="text-sm text-gray-500">SKU: LIPSTICK-001</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="font-medium">260,000đ</p>
+                                    <p class="text-sm text-gray-500 line-through">320,000đ</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <span class="font-medium">45</span>
+                                        <i class="fas fa-exclamation-circle text-yellow-500 ml-2" title="Tồn kho thấp"></i>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="channel-badge w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center cursor-pointer" title="Shopee">
+                                            <i class="fab fa-shopify text-orange-600"></i>
+                                        </span>
+                                        <span class="channel-badge w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center cursor-pointer" title="Facebook">
+                                            <i class="fab fa-facebook text-blue-600"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+                                        Đang bán
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2 row-actions">
+                                        <button class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Product Row 2 -->
+                            <tr class="table-row">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" class="rounded">
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://images.unsplash.com/photo-1611080541599-8c6dbde6ed28?w=50&h=50&fit=crop" 
+                                             alt="Product" 
+                                             class="w-12 h-12 rounded-lg object-cover image-preview cursor-pointer">
+                                        <div>
+                                            <p class="font-medium text-gray-900">Kem dưỡng da B456</p>
+                                            <p class="text-sm text-gray-500">SKU: CREAM-002</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="font-medium">380,000đ</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <span class="font-medium">156</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="channel-badge w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center cursor-pointer" title="Shopee">
+                                            <i class="fab fa-shopify text-orange-600"></i>
+                                        </span>
+                                        <span class="channel-badge w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer" title="TikTok">
+                                            <i class="fab fa-tiktok text-gray-900"></i>
+                                        </span>
+                                        <span class="channel-badge w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center cursor-pointer" title="Facebook">
+                                            <i class="fab fa-facebook text-blue-600"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+                                        Đang bán
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2 row-actions">
+                                        <button class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Product Row 3 -->
+                            <tr class="table-row">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" class="rounded">
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=50&h=50&fit=crop" 
+                                             alt="Product" 
+                                             class="w-12 h-12 rounded-lg object-cover image-preview cursor-pointer">
+                                        <div>
+                                            <p class="font-medium text-gray-900">Nước hoa hồng C789</p>
+                                            <p class="text-sm text-gray-500">SKU: TONER-003</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="font-medium">180,000đ</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <span class="font-medium text-red-600">0</span>
+                                        <i class="fas fa-exclamation-circle text-red-500 ml-2" title="Hết hàng"></i>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="channel-badge w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer" title="TikTok">
+                                            <i class="fab fa-tiktok text-gray-900"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
+                                        Hết hàng
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2 row-actions">
+                                        <button class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-6 py-4 border-t">
+                    <div class="text-sm text-gray-600">
+                        Hiển thị 1-10 trong 156 sản phẩm
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-3 py-1 bg-blue-600 text-white rounded-lg">1</button>
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">2</button>
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">3</button>
+                        <span class="px-3 py-1 text-gray-400">...</span>
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">16</button>
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Cards - Mobile -->
+            <div class="lg:hidden space-y-4">
+                <!-- Product Card 1 -->
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                    <div class="flex items-start space-x-4">
+                        <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=80&h=80&fit=crop" 
+                             alt="Product" 
+                             class="w-20 h-20 rounded-lg object-cover">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900">Son môi cao cấp A123</h3>
+                            <p class="text-sm text-gray-500 mb-2">SKU: LIPSTICK-001</p>
+                            <div class="flex items-center space-x-4 text-sm">
+                                <span class="font-medium">260,000đ</span>
+                                <span class="text-gray-500">Kho: 45</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-3">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-6 h-6 bg-orange-100 rounded flex items-center justify-center">
+                                        <i class="fab fa-shopify text-orange-600 text-xs"></i>
+                                    </span>
+                                    <span class="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
+                                        <i class="fab fa-facebook text-blue-600 text-xs"></i>
+                                    </span>
+                                </div>
+                                <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                                    Đang bán
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-4 pt-4 border-t">
+                        <button class="flex-1 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                            <i class="fas fa-edit mr-1"></i>Sửa
+                        </button>
+                        <button class="flex-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition">
+                            <i class="fas fa-trash mr-1"></i>Xóa
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 2 -->
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                    <div class="flex items-start space-x-4">
+                        <img src="https://images.unsplash.com/photo-1611080541599-8c6dbde6ed28?w=80&h=80&fit=crop" 
+                             alt="Product" 
+                             class="w-20 h-20 rounded-lg object-cover">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900">Kem dưỡng da B456</h3>
+                            <p class="text-sm text-gray-500 mb-2">SKU: CREAM-002</p>
+                            <div class="flex items-center space-x-4 text-sm">
+                                <span class="font-medium">380,000đ</span>
+                                <span class="text-gray-500">Kho: 156</span>
+                            </div>
+                            <div class="flex items-center justify-between mt-3">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-6 h-6 bg-orange-100 rounded flex items-center justify-center">
+                                        <i class="fab fa-shopify text-orange-600 text-xs"></i>
+                                    </span>
+                                    <span class="w-6 h-6 bg-gray-100 rounded flex items-center justify-center">
+                                        <i class="fab fa-tiktok text-gray-900 text-xs"></i>
+                                    </span>
+                                    <span class="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
+                                        <i class="fab fa-facebook text-blue-600 text-xs"></i>
+                                    </span>
+                                </div>
+                                <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">
+                                    Đang bán
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-4 pt-4 border-t">
+                        <button class="flex-1 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                            <i class="fas fa-edit mr-1"></i>Sửa
+                        </button>
+                        <button class="flex-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition">
+                            <i class="fas fa-trash mr-1"></i>Xóa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden overflow-y-auto">
+        <div class="bg-white rounded-2xl w-full max-w-4xl mx-4 my-8 modal-content">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b flex items-center justify-between">
+                <h2 class="text-xl font-semibold">Thêm sản phẩm mới</h2>
+                <button onclick="hideAddProductModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+                <form class="space-y-6">
+                    <!-- Basic Info -->
+                    <div>
+                        <h3 class="text-lg font-medium mb-4">Thông tin cơ bản</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tên sản phẩm</label>
+                                <input type="text" 
+                                       placeholder="Nhập tên sản phẩm" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">SKU</label>
+                                <input type="text" 
+                                       placeholder="Mã sản phẩm" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Danh mục</label>
+                                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option>Chọn danh mục</option>
+                                    <option>Mỹ phẩm</option>
+                                    <option>Chăm sóc da</option>
+                                    <option>Trang điểm</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Images -->
+                    <div>
+                        <h3 class="text-lg font-medium mb-4">Hình ảnh sản phẩm</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg h-32 flex items-center justify-center cursor-pointer hover:border-blue-500 transition">
+                                <div class="text-center">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-600">Tải ảnh lên</p>
+                                </div>
+                            </div>
+                            <div class="relative group">
+                                <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=150&h=150&fit=crop" 
+                                     alt="Product" 
+                                     class="w-full h-32 object-cover rounded-lg">
+                                <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                    <button class="text-white hover:text-red-500">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Variants -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium">Biến thể sản phẩm</h3>
+                            <button type="button" onclick="addVariant()" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                <i class="fas fa-plus mr-1"></i>Thêm biến thể
+                            </button>
+                        </div>
+                        <div id="variantContainer" class="space-y-3">
+                            <!-- Variant Row -->
+                            <div class="variant-row border rounded-lg p-4">
+                                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Tên biến thể</label>
+                                        <input type="text" 
+                                               placeholder="VD: Màu đỏ" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Giá bán</label>
+                                        <input type="number" 
+                                               placeholder="0" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Tồn kho</label>
+                                        <input type="number" 
+                                               placeholder="0" 
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div class="flex items-end">
+                                        <button type="button" class="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Channel Selection -->
+                    <div>
+                        <h3 class="text-lg font-medium mb-4">Kênh bán hàng</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" class="rounded text-blue-600" checked>
+                                    <i class="fab fa-shopify text-orange-600 text-xl"></i>
+                                    <span class="font-medium">Shopee</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                            <label class="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" class="rounded text-blue-600">
+                                    <i class="fab fa-tiktok text-gray-900 text-xl"></i>
+                                    <span class="font-medium">TikTok Shop</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                            <label class="flex items-center justify-between p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                <div class="flex items-center space-x-3">
+                                    <input type="checkbox" class="rounded text-blue-600">
+                                    <i class="fab fa-facebook text-blue-600 text-xl"></i>
+                                    <span class="font-medium">Facebook</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả sản phẩm</label>
+                        <textarea rows="4" 
+                                  placeholder="Nhập mô tả chi tiết về sản phẩm..." 
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t flex items-center justify-end space-x-3">
+                <button onclick="hideAddProductModal()" class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition">
+                    Hủy
+                </button>
+                <button class="px-6 py-2 gradient-primary text-white rounded-lg hover:shadow-lg transition">
+                    Thêm sản phẩm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-30">
+        <div class="grid grid-cols-5 gap-1">
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">Tổng quan</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs">Đơn hàng</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-blue-600">
+                <i class="fas fa-box text-xl mb-1"></i>
+                <span class="text-xs">Sản phẩm</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-robot text-xl mb-1"></i>
+                <span class="text-xs">AI</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">Tài khoản</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Floating Add Button - Mobile -->
+    <button onclick="showAddProductModal()" class="lg:hidden fixed bottom-20 right-4 w-14 h-14 gradient-primary text-white rounded-full shadow-lg hover:shadow-xl transition z-30">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script>
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobileSidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Show/Hide Add Product Modal
+        function showAddProductModal() {
+            document.getElementById('addProductModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideAddProductModal() {
+            document.getElementById('addProductModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Add Variant Row
+        function addVariant() {
+            const container = document.getElementById('variantContainer');
+            const variantRow = document.createElement('div');
+            variantRow.className = 'variant-row border rounded-lg p-4';
+            variantRow.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Tên biến thể</label>
+                        <input type="text" 
+                               placeholder="VD: Màu xanh" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Giá bán</label>
+                        <input type="number" 
+                               placeholder="0" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Tồn kho</label>
+                        <input type="number" 
+                               placeholder="0" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" onclick="removeVariant(this)" class="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(variantRow);
+        }
+
+        // Remove Variant Row
+        function removeVariant(button) {
+            button.closest('.variant-row').remove();
+        }
+
+        // Select all checkboxes
+        document.querySelector('thead input[type="checkbox"]')?.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // Image preview on click
+        document.querySelectorAll('.image-preview').forEach(img => {
+            img.addEventListener('click', function() {
+                // Open image in modal or lightbox
+                alert('Image preview would open here');
+            });
+        });
+
+        // Bulk actions
+        function showBulkActions() {
+            const checkedBoxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+            if (checkedBoxes.length > 0) {
+                // Show bulk action bar
+                console.log(`${checkedBoxes.length} items selected`);
+            }
+        }
+
+        // Search functionality
+        const searchInput = document.querySelector('input[placeholder="Tìm kiếm sản phẩm..."]');
+        searchInput?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            // Filter products based on search term
+            console.log('Searching for:', searchTerm);
+        });
+
+        // Filter functionality
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', function() {
+                // Apply filters
+                console.log('Filter changed:', this.value);
+            });
+        });
+
+        // Add loading skeleton on page load
+        window.addEventListener('load', () => {
+            const rows = document.querySelectorAll('.table-row');
+            rows.forEach((row, index) => {
+                setTimeout(() => {
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(-20px)';
+                    setTimeout(() => {
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.opacity = '1';
+                        row.style.transform = 'translateX(0)';
+                    }, 100);
+                }, index * 50);
+            });
+        });
+    </script>
+</body>
+</html>
