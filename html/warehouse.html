@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kho hàng - OmniSell</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        }
+        
+        .gradient-danger {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        }
+        
+        /* Sidebar animations */
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            padding-left: 28px;
+        }
+        
+        .sidebar-item.active {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            color: #3B82F6;
+        }
+        
+        /* Inventory cards */
+        .inventory-card {
+            transition: all 0.3s ease;
+        }
+        
+        .inventory-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        /* Stock status */
+        .stock-critical {
+            background-color: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .stock-low {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .stock-normal {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .stock-overstock {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+        }
+        
+        /* Mobile menu animation */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Quick edit input */
+        .quick-edit {
+            transition: all 0.2s ease;
+        }
+        
+        .quick-edit:focus {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Channel sync status */
+        .sync-status {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Activity timeline */
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 20px;
+            bottom: -20px;
+            width: 2px;
+            background-color: #E5E7EB;
+        }
+        
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: 4px;
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            background-color: #3B82F6;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        
+        /* Loading skeleton */
+        @keyframes skeleton {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton 1.5s infinite;
+        }
+        
+        /* Notification badge */
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Chart container */
+        .mini-chart {
+            height: 60px;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-40">
+        <div class="flex items-center justify-between p-4">
+            <button onclick="toggleMobileMenu()" class="text-gray-700">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-sm"></i>
+                </div>
+                <span class="text-lg font-bold text-gray-900">OmniSell</span>
+            </div>
+            <button class="relative">
+                <i class="fas fa-bell text-gray-700 text-xl"></i>
+                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:block fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-30">
+        <div class="p-6">
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+            </div>
+            
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="orders.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="products.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="chat.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="warehouse.html" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="ai-assistant.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="reports.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+            
+            <div class="mt-8 pt-8 border-t">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-plug text-lg"></i>
+                    <span>Kết nối kênh</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-cog text-lg"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Sidebar -->
+    <aside id="mobileSidebar" class="lg:hidden fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-50 mobile-menu">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-store text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="text-gray-500">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-1"></nav>
+                <a href="dashboard.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="orders.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="products.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="chat.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="warehouse.html" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="ai-assistant.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="reports.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileOverlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 hidden" onclick="toggleMobileMenu()"></div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 pt-16 lg:pt-0">
+        <!-- Top Navigation -->
+        <nav class="hidden lg:flex items-center justify-between bg-white px-8 py-4 shadow-sm">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-semibold text-gray-900">Quản lý kho hàng</h1>
+                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
+                    Tổng: 156 sản phẩm
+                </span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="showImportModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <i class="fas fa-download mr-2"></i>Nhập kho
+                </button>
+                <button onclick="showExportModal()" class="px-4 py-2 gradient-primary text-white rounded-lg hover:shadow-lg transition">
+                    <i class="fas fa-upload mr-2"></i>Xuất kho
+                </button>
+                <button class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+                </button>
+                <div class="flex items-center space-x-3 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop" 
+                         alt="Avatar" 
+                         class="w-10 h-10 rounded-full">
+                    <div>
+                        <p class="font-medium text-gray-900">Nguyễn Văn A</p>
+                        <p class="text-xs text-gray-500">Admin</p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Inventory Content -->
+        <div class="p-4 lg:p-8">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="inventory-card bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-boxes text-white text-xl"></i>
+                        </div>
+                        <span class="text-sm text-green-600 font-medium">
+                            <i class="fas fa-arrow-up mr-1"></i>12%
+                        </span>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900">8,456</h3>
+                    <p class="text-sm text-gray-600 mt-1">Tổng sản phẩm</p>
+                </div>
+
+                <div class="inventory-card bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center">
+                            <i class="fas fa-dollar-sign text-white text-xl"></i>
+                        </div>
+                        <div class="mini-chart">
+                            <canvas id="valueChart"></canvas>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900">423.5M</h3>
+                    <p class="text-sm text-gray-600 mt-1">Giá trị kho</p>
+                </div>
+
+                <div class="inventory-card bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-warning rounded-lg flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+                        </div>
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">
+                            Cần xử lý
+                        </span>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900">12</h3>
+                    <p class="text-sm text-gray-600 mt-1">Sắp hết hàng</p>
+                </div>
+
+                <div class="inventory-card bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-danger rounded-lg flex items-center justify-center">
+                            <i class="fas fa-times-circle text-white text-xl"></i>
+                        </div>
+                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                            Khẩn cấp
+                        </span>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900">5</h3>
+                    <p class="text-sm text-gray-600 mt-1">Hết hàng</p>
+                </div>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="bg-white rounded-xl p-4 shadow-sm mb-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div class="flex-1 max-w-md">
+                        <div class="relative">
+                            <input type="text" 
+                                   placeholder="Tìm kiếm sản phẩm..." 
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>Tất cả trạng thái</option>
+                            <option>Còn hàng</option>
+                            <option>Sắp hết</option>
+                            <option>Hết hàng</option>
+                            <option>Tồn kho cao</option>
+                        </select>
+                        <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option>Tất cả danh mục</option>
+                            <option>Mỹ phẩm</option>
+                            <option>Chăm sóc da</option>
+                            <option>Trang điểm</option>
+                        </select>
+                        <button class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                            <i class="fas fa-sync mr-2"></i>Đồng bộ kho
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-6 py-4 text-left">
+                                    <input type="checkbox" class="rounded">
+                                </th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Sản phẩm</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">SKU</th>
+                                <th class="px-6 py-4 text-center text-sm font-medium text-gray-700">Tổng kho</th>
+                                <th class="px-6 py-4 text-center text-sm font-medium text-gray-700">
+                                    <i class="fab fa-shopify text-orange-600"></i> Shopee
+                                </th>
+                                <th class="px-6 py-4 text-center text-sm font-medium text-gray-700">
+                                    <i class="fab fa-tiktok"></i> TikTok
+                                </th>
+                                <th class="px-6 py-4 text-center text-sm font-medium text-gray-700">
+                                    <i class="fab fa-facebook text-blue-600"></i> Facebook
+                                </th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-700">Trạng thái</th>
+                                <th class="px-6 py-4 text-center text-sm font-medium text-gray-700">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <!-- Product Row 1 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" class="rounded">
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=50&h=50&fit=crop" 
+                                             alt="Product" 
+                                             class="w-12 h-12 rounded-lg object-cover">
+                                        <div>
+                                            <p class="font-medium text-gray-900">Son môi cao cấp A123</p>
+                                            <p class="text-sm text-gray-500">Màu: Đỏ cam san hô</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-mono text-sm">LIPSTICK-001</span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <input type="number" 
+                                           value="45" 
+                                           class="quick-edit w-16 px-2 py-1 text-center border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                           onchange="updateStock(this)">
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <input type="number" 
+                                               value="15" 
+                                               class="quick-edit w-14 px-2 py-1 text-center border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                               onchange="updateChannelStock(this, 'shopee')">
+                                        <span class="sync-status text-green-500" title="Đã đồng bộ">
+                                            <i class="fas fa-check-circle text-xs"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <input type="number" 
+                                               value="20" 
+                                               class="quick-edit w-14 px-2 py-1 text-center border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                               onchange="updateChannelStock(this, 'tiktok')">
+                                        <span class="sync-status text-green-500" title="Đã đồng bộ">
+                                            <i class="fas fa-check-circle text-xs"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <input type="number" 
+                                               value="10" 
+                                               class="quick-edit w-14 px-2 py-1 text-center border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                               onchange="updateChannelStock(this, 'facebook')">
+                                        <span class="text-yellow-500" title="Đang đồng bộ">
+                                            <i class="fas fa-sync fa-spin text-xs"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 text-xs font-medium stock-low rounded-full">
+                                        Sắp hết hàng
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button onclick="showStockHistory()" class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Lịch sử">
+                                            <i class="fas fa-history"></i>
+                                        </button>
+                                        <button onclick="showQuickImport()" class="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition" title="Nhập hàng">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                        <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition" title="Chi tiết">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Product Row 2 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" class="rounded">
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://images.unsplash.com/photo-1611080541599-8c6dbde6ed28?w=50&h=50&fit=crop" 
+                                             alt="Product" 
+                                             class="w-12 h-12 rounded-lg object-cover">
+                                        <div>
+                                            <p class="font-medium text-gray-900">Kem dưỡng da B456</p>
+                                            <p class="text-sm text-gray-500">Dung tích: 50ml</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-mono text-sm">CREAM-002</span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <input type="number" 
+                                           value="156" 
+                                           class="quick-edit w-16 px-2 py-1 text-center border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                           onchange="updateStock(this)">
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <input type="number" 
+                                               value="50" 
+                                               class="quick-edit w-14 px-2 py-1 text-center border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                               onchange="updateChannelStock(this, 'shopee')">
+                                        <span class="sync-status text-green-500" title="Đã đồng bộ">
+                                            <i class="fas fa-check-circle text-xs"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <input type="number" 
+                                               value="56" 
+                                               class="quick-edit w-14 px-2 py-1 text-center border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-gray-500"
+                                               onchange="updateChannelStock(this, 'tiktok')">
+                                        <span class="sync-status text-green-500" title="Đã đồng bộ">
+                                            <i class="fas fa-check-circle text-xs"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <input type="number" 
+                                               value="50" 
+                                               class="quick-edit w-14 px-2 py-1 text-center border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                               onchange="updateChannelStock(this, 'facebook')">
+                                        <span class="sync-status text-green-500" title="Đã đồng bộ">
+                                            <i class="fas fa-check-circle text-xs"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 text-xs font-medium stock-normal rounded-full">
+                                        Còn hàng
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button onclick="showStockHistory()" class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Lịch sử">
+                                            <i class="fas fa-history"></i>
+                                        </button>
+                                        <button onclick="showQuickExport()" class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Xuất hàng">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition" title="Chi tiết">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Product Row 3 -->
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" class="rounded">
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=50&h=50&fit=crop" 
+                                             alt="Product" 
+                                             class="w-12 h-12 rounded-lg object-cover">
+                                        <div>
+                                            <p class="font-medium text-gray-900">Nước hoa hồng C789</p>
+                                            <p class="text-sm text-gray-500">Dung tích: 150ml</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="font-mono text-sm">TONER-003</span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <input type="number" 
+                                           value="0" 
+                                           class="quick-edit w-16 px-2 py-1 text-center border border-red-300 rounded text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                           onchange="updateStock(this)">
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <input type="number" 
+                                               value="0" 
+                                               class="quick-edit w-14 px-2 py-1 text-center border border-red-300 rounded text-sm text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                               disabled>
+                                        <span class="text-red-500" title="Hết hàng">
+                                            <i class="fas fa-times-circle text-xs"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <input type="number" 
+                                               value="0" 
+                                               class="quick-edit w-14 px-2 py-1 text-center border border-red-300 rounded text-sm text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                               disabled>
+                                        <span class="text-red-500" title="Hết hàng">
+                                            <i class="fas fa-times-circle text-xs"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <input type="number" 
+                                               value="0" 
+                                               class="quick-edit w-14 px-2 py-1 text-center border border-red-300 rounded text-sm text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                               disabled>
+                                        <span class="text-red-500" title="Hết hàng">
+                                            <i class="fas fa-times-circle text-xs"></i>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 text-xs font-medium stock-critical rounded-full">
+                                        Hết hàng
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <button onclick="showStockHistory()" class="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Lịch sử">
+                                            <i class="fas fa-history"></i>
+                                        </button>
+                                        <button onclick="showQuickImport()" class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition" title="Nhập khẩn">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                        </button>
+                                        <button class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition" title="Chi tiết">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex items-center justify-between px-6 py-4 border-t">
+                    <div class="text-sm text-gray-600">
+                        Hiển thị 1-10 trong 156 sản phẩm
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-3 py-1 bg-blue-600 text-white rounded-lg">1</button>
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">2</button>
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">3</button>
+                        <span class="px-3 py-1 text-gray-400">...</span>
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">16</button>
+                        <button class="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-lg transition">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                <!-- Low Stock Alert -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Cảnh báo tồn kho</h3>
+                        <a href="#" class="text-sm text-blue-600 hover:text-blue-700">Xem tất cả</a>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-box text-red-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Son môi A123</p>
+                                    <p class="text-sm text-red-600">Hết hàng trên TikTok</p>
+                                </div>
+                            </div>
+                            <button class="text-sm text-blue-600 font-medium hover:text-blue-700">Nhập hàng</button>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-box text-yellow-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">Serum vitamin C</p>
+                                    <p class="text-sm text-yellow-600">Chỉ còn 5 sản phẩm</p>
+                                </div>
+                            </div>
+                            <button class="text-sm text-blue-600 font-medium hover:text-blue-700">Nhập hàng</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock Activity Timeline -->
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Hoạt động gần đây</h3>
+                        <a href="#" class="text-sm text-blue-600 hover:text-blue-700">Xem tất cả</a>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900">Nhập kho</p>
+                                    <p class="text-sm text-gray-600">+100 Son môi A123</p>
+                                </div>
+                                <span class="text-xs text-gray-500">5 phút trước</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot bg-red-500"></div>
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900">Xuất kho</p>
+                                    <p class="text-sm text-gray-600">-25 Kem dưỡng B456 (Đơn #SP12345)</p>
+                                </div>
+                                <span class="text-xs text-gray-500">1 giờ trước</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot bg-yellow-500"></div>
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <p class="font-medium text-gray-900">Điều chỉnh</p>
+                                    <p class="text-sm text-gray-600">Cập nhật số lượng Serum C789</p>
+                                </div>
+                                <span class="text-xs text-gray-500">2 giờ trước</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Quick Import Modal -->
+    <div id="quickImportModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl w-full max-w-md mx-4">
+            <div class="px-6 py-4 border-b flex items-center justify-between">
+                <h2 class="text-xl font-semibold">Nhập kho nhanh</h2>
+                <button onclick="hideQuickImport()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sản phẩm</label>
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=50&h=50&fit=crop" 
+                             alt="Product" 
+                             class="w-12 h-12 rounded-lg object-cover">
+                        <div>
+                            <p class="font-medium">Son môi cao cấp A123</p>
+                            <p class="text-sm text-gray-500">Tồn kho hiện tại: 45</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Số lượng nhập</label>
+                    <input type="number" 
+                           placeholder="0" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ghi chú</label>
+                    <textarea rows="3" 
+                              placeholder="Nhập ghi chú (không bắt buộc)" 
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="hideQuickImport()" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Hủy
+                    </button>
+                    <button class="flex-1 px-4 py-2 gradient-primary text-white rounded-lg hover:shadow-lg transition">
+                        Nhập kho
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-30">
+        <div class="grid grid-cols-5 gap-1">
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">Tổng quan</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs">Đơn hàng</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-box text-xl mb-1"></i>
+                <span class="text-xs">Sản phẩm</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-blue-600">
+                <i class="fas fa-warehouse text-xl mb-1"></i>
+                <span class="text-xs">Kho hàng</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">Tài khoản</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Floating Action Buttons - Mobile -->
+    <div class="lg:hidden fixed bottom-20 right-4 flex flex-col space-y-3 z-30">
+        <button onclick="showImportModal()" class="w-14 h-14 bg-gray-600 text-white rounded-full shadow-lg hover:shadow-xl transition">
+            <i class="fas fa-download"></i>
+        </button>
+        <button onclick="showExportModal()" class="w-14 h-14 gradient-primary text-white rounded-full shadow-lg hover:shadow-xl transition">
+            <i class="fas fa-upload"></i>
+        </button>
+    </div>
+
+    <script>
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobileSidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Initialize mini chart
+        const valueCtx = document.getElementById('valueChart').getContext('2d');
+        const valueChart = new Chart(valueCtx, {
+            type: 'line',
+            data: {
+                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                datasets: [{
+                    data: [380, 395, 410, 405, 415, 420, 423.5],
+                    borderColor: '#10B981',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        display: false
+                    },
+                    y: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Update stock functions
+        function updateStock(input) {
+            const value = parseInt(input.value);
+            const row = input.closest('tr');
+            
+            // Update status based on value
+            const statusCell = row.querySelector('td:nth-child(8)');
+            let statusHtml = '';
+            
+            if (value === 0) {
+                statusHtml = '<span class="px-3 py-1 text-xs font-medium stock-critical rounded-full">Hết hàng</span>';
+                input.classList.add('border-red-300', 'text-red-600');
+            } else if (value < 50) {
+                statusHtml = '<span class="px-3 py-1 text-xs font-medium stock-low rounded-full">Sắp hết hàng</span>';
+                input.classList.remove('border-red-300', 'text-red-600');
+            } else {
+                statusHtml = '<span class="px-3 py-1 text-xs font-medium stock-normal rounded-full">Còn hàng</span>';
+                input.classList.remove('border-red-300', 'text-red-600');
+            }
+            
+            statusCell.innerHTML = statusHtml;
+            
+            // Show sync animation
+            showSyncAnimation(input);
+        }
+
+        function updateChannelStock(input, channel) {
+            const value = parseInt(input.value);
+            const syncIcon = input.nextElementSibling;
+            
+            // Show syncing
+            syncIcon.innerHTML = '<i class="fas fa-sync fa-spin text-xs"></i>';
+            syncIcon.className = 'text-yellow-500';
+            
+            // Simulate sync
+            setTimeout(() => {
+                syncIcon.innerHTML = '<i class="fas fa-check-circle text-xs"></i>';
+                syncIcon.className = 'sync-status text-green-500';
+            }, 1500);
+            
+            // Update total if needed
+            updateTotalStock(input.closest('tr'));
+        }
+
+        function updateTotalStock(row) {
+            const shopee = parseInt(row.querySelector('td:nth-child(5) input').value) || 0;
+            const tiktok = parseInt(row.querySelector('td:nth-child(6) input').value) || 0;
+            const facebook = parseInt(row.querySelector('td:nth-child(7) input').value) || 0;
+            const total = shopee + tiktok + facebook;
+            
+            const totalInput = row.querySelector('td:nth-child(4) input');
+            totalInput.value = total;
+            updateStock(totalInput);
+        }
+
+        function showSyncAnimation(element) {
+            element.classList.add('ring-2', 'ring-green-500');
+            setTimeout(() => {
+                element.classList.remove('ring-2', 'ring-green-500');
+            }, 1000);
+        }
+
+        // Modal functions
+        function showQuickImport() {
+            document.getElementById('quickImportModal').classList.remove('hidden');
+        }
+
+        function hideQuickImport() {
+            document.getElementById('quickImportModal').classList.add('hidden');
+        }
+
+        function showImportModal() {
+            console.log('Show import modal');
+        }
+
+        function showExportModal() {
+            console.log('Show export modal');
+        }
+
+        function showStockHistory() {
+            console.log('Show stock history');
+        }
+
+        function showQuickExport() {
+            console.log('Show quick export');
+        }
+
+        // Real-time sync simulation
+        setInterval(() => {
+            // Randomly update sync status
+            const syncIcons = document.querySelectorAll('.sync-status');
+            const randomIcon = syncIcons[Math.floor(Math.random() * syncIcons.length)];
+            
+            if (randomIcon && Math.random() > 0.8) {
+                randomIcon.innerHTML = '<i class="fas fa-sync fa-spin text-xs"></i>';
+                randomIcon.className = 'text-yellow-500';
+                
+                setTimeout(() => {
+                    randomIcon.innerHTML = '<i class="fas fa-check-circle text-xs"></i>';
+                    randomIcon.className = 'sync-status text-green-500';
+                }, 2000);
+            }
+        }, 5000);
+
+        // Select all checkboxes
+        document.querySelector('thead input[type="checkbox"]')?.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // Load animations
+        window.addEventListener('load', () => {
+            const cards = document.querySelectorAll('.inventory-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.5s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

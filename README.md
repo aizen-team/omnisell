@@ -26,7 +26,7 @@
 
 ```bash
 # Clone repo
-git clone https://github.com/your-org/omnisell.git
+git clone git@github.com:aizen-team/omnisell.git
 cd omnisell
 
 # Cài backend

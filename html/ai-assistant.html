@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant - OmniSell</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+        }
+        
+        .gradient-ai {
+            background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        }
+        
+        /* Sidebar animations */
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            padding-left: 28px;
+        }
+        
+        .sidebar-item.active {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            color: #3B82F6;
+        }
+        
+        /* AI feature cards */
+        .ai-card {
+            transition: all 0.3s ease;
+        }
+        
+        .ai-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        /* Mobile menu animation */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Message suggestions */
+        .suggestion-item {
+            transition: all 0.3s ease;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #F3F4F6;
+            transform: translateX(5px);
+        }
+        
+        /* Typing animation */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 2s steps(40, end);
+        }
+        
+        /* AI pulse animation */
+        @keyframes aiPulse {
+            0%, 100% { 
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+        
+        .ai-pulse {
+            animation: aiPulse 2s ease-in-out infinite;
+        }
+        
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            height: 200px;
+        }
+        
+        /* Loading dots */
+        .loading-dots {
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .loading-dots span {
+            height: 8px;
+            width: 8px;
+            background-color: #6B7280;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: loading 1.4s infinite;
+        }
+        
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes loading {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #CBD5E1;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #8B5CF6;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        
+        /* Notification badge */
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-40">
+        <div class="flex items-center justify-between p-4">
+            <button onclick="toggleMobileMenu()" class="text-gray-700">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-sm"></i>
+                </div>
+                <span class="text-lg font-bold text-gray-900">OmniSell</span>
+            </div>
+            <button class="relative">
+                <i class="fas fa-bell text-gray-700 text-xl"></i>
+                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:block fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-30">
+        <div class="p-6">
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+            </div>
+            
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="orders.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="products.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="chat.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="warehouse.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="ai-assistant.html" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="reports.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+            
+            <div class="mt-8 pt-8 border-t">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-plug text-lg"></i>
+                    <span>Kết nối kênh</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-cog text-lg"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Sidebar -->
+    <aside id="mobileSidebar" class="lg:hidden fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-50 mobile-menu">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-store text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="text-gray-500">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="orders.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="products.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="chat.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="warehouse.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="ai-assistant.html" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="reports.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileOverlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 hidden" onclick="toggleMobileMenu()"></div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 pt-16 lg:pt-0">
+        <!-- Top Navigation -->
+        <nav class="hidden lg:flex items-center justify-between bg-white px-8 py-4 shadow-sm">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-semibold text-gray-900">AI Assistant</h1>
+                <span class="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full flex items-center">
+                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2 ai-pulse"></span>
+                    AI đang hoạt động
+                </span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <i class="fas fa-cog mr-2"></i>Cài đặt AI
+                </button>
+                <button class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+                </button>
+                <div class="flex items-center space-x-3 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop" 
+                         alt="Avatar" 
+                         class="w-10 h-10 rounded-full">
+                    <div>
+                        <p class="font-medium text-gray-900">Nguyễn Văn A</p>
+                        <p class="text-xs text-gray-500">Admin</p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- AI Assistant Content -->
+        <div class="p-4 lg:p-8">
+            <!-- Hero Section -->
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 lg:p-8 text-white mb-8">
+                <div class="flex flex-col lg:flex-row items-center justify-between">
+                    <div class="mb-4 lg:mb-0">
+                        <h2 class="text-2xl lg:text-3xl font-bold mb-2">AI Assistant thông minh</h2>
+                        <p class="text-white/90">Trợ lý ảo giúp bạn bán hàng hiệu quả hơn 10x</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-center">
+                            <p class="text-3xl font-bold">2,456</p>
+                            <p class="text-sm text-white/80">Tin nhắn đã trả lời</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-3xl font-bold">98%</p>
+                            <p class="text-sm text-white/80">Độ chính xác</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Features Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+                <!-- Auto Reply -->
+                <div class="ai-card bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-ai rounded-lg flex items-center justify-center">
+                            <i class="fas fa-reply-all text-white text-xl"></i>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Tự động trả lời</h3>
+                    <p class="text-sm text-gray-600 mb-4">AI trả lời khách hàng 24/7 với ngữ cảnh phù hợp</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">Hôm nay</span>
+                        <span class="font-semibold text-green-600">+156 tin nhắn</span>
+                    </div>
+                </div>
+
+                <!-- Message Suggestions -->
+                <div class="ai-card bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-ai rounded-lg flex items-center justify-center">
+                            <i class="fas fa-lightbulb text-white text-xl"></i>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Gợi ý tin nhắn</h3>
+                    <p class="text-sm text-gray-600 mb-4">Đề xuất câu trả lời phù hợp cho từng tình huống</p>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500">Độ chính xác</span>
+                        <span class="font-semibold text-green-600">95%</span>
+                    </div>
+                </div>
+
+                <!-- Sales Advisor -->
+                <div class="ai-card bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-ai rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-white text-xl"></i>
+                        </div>
+                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Mới</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Tư vấn bán hàng</h3>
+                    <p class="text-sm text-gray-600 mb-4">Phân tích và đưa ra chiến lược bán hàng tối ưu</p>
+                    <button class="text-sm text-purple-600 font-medium hover:text-purple-700">
+                        Xem báo cáo →
+                    </button>
+                </div>
+
+                <!-- Product Analysis -->
+                <div class="ai-card bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-ai rounded-lg flex items-center justify-center">
+                            <i class="fas fa-fire text-white text-xl"></i>
+                        </div>
+                        <div class="loading-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Phân tích hot trend</h3>
+                    <p class="text-sm text-gray-600 mb-4">Dự đoán sản phẩm trending và đề xuất nhập hàng</p>
+                    <div class="text-sm text-purple-600">
+                        Đang phân tích...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main AI Dashboard -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Message Templates -->
+                <div class="bg-white rounded-xl shadow-sm">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">Mẫu tin nhắn thông minh</h3>
+                        <p class="text-sm text-gray-600 mt-1">AI đã học từ 10,000+ cuộc hội thoại</p>
+                    </div>
+                    <div class="p-6 space-y-3 max-h-96 overflow-y-auto">
+                        <!-- Template 1 -->
+                        <div class="suggestion-item p-4 border rounded-lg cursor-pointer">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Chào hỏi</span>
+                                <span class="text-xs text-gray-500">Sử dụng 234 lần</span>
+                            </div>
+                            <p class="text-sm text-gray-800">Chào bạn! Mình có thể giúp gì cho bạn hôm nay ạ? 😊</p>
+                        </div>
+                        
+                        <!-- Template 2 -->
+                        <div class="suggestion-item p-4 border rounded-lg cursor-pointer">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Giá cả</span>
+                                <span class="text-xs text-gray-500">Sử dụng 189 lần</span>
+                            </div>
+                            <p class="text-sm text-gray-800">Giá sản phẩm {product_name} là {price}. Hiện đang có chương trình giảm giá {discount}% nhé!</p>
+                        </div>
+                        
+                        <!-- Template 3 -->
+                        <div class="suggestion-item p-4 border rounded-lg cursor-pointer">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Ship hàng</span>
+                                <span class="text-xs text-gray-500">Sử dụng 156 lần</span>
+                            </div>
+                            <p class="text-sm text-gray-800">Shop ship toàn quốc ạ. Phí ship dao động từ 20-40k tùy khu vực. Thời gian nhận hàng 2-3 ngày nhé!</p>
+                        </div>
+                        
+                        <!-- Template 4 -->
+                        <div class="suggestion-item p-4 border rounded-lg cursor-pointer">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Tư vấn</span>
+                                <span class="text-xs text-gray-500">Sử dụng 98 lần</span>
+                            </div>
+                            <p class="text-sm text-gray-800">Dựa vào nhu cầu của bạn, mình suggest sản phẩm {product_name} vì {reason}. Bạn có muốn xem thêm không ạ?</p>
+                        </div>
+                        
+                        <button class="w-full py-2 text-center text-purple-600 hover:bg-purple-50 rounded-lg transition">
+                            <i class="fas fa-plus mr-2"></i>Thêm mẫu mới
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sales Insights -->
+                <div class="bg-white rounded-xl shadow-sm">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">AI Insights</h3>
+                        <p class="text-sm text-gray-600 mt-1">Phân tích từ AI cho shop của bạn</p>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <!-- Insight 1 -->
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-info text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900 mb-1">Cơ hội tăng doanh thu</p>
+                                    <p class="text-sm text-gray-600">70% khách hàng hỏi về son môi màu cam san hô. Nên nhập thêm màu này.</p>
+                                    <button class="text-xs text-blue-600 font-medium mt-2">Xem chi tiết →</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Insight 2 -->
+                        <div class="p-4 bg-green-50 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-chart-line text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900 mb-1">Hiệu suất tốt</p>
+                                    <p class="text-sm text-gray-600">Tỷ lệ chuyển đổi tăng 15% khi sử dụng AI trả lời tự động.</p>
+                                    <div class="flex items-center space-x-2 mt-2">
+                                        <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                            <div class="bg-green-500 h-2 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                        <span class="text-xs font-medium">85%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Insight 3 -->
+                        <div class="p-4 bg-yellow-50 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-exclamation text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900 mb-1">Cần cải thiện</p>
+                                    <p class="text-sm text-gray-600">Thời gian phản hồi trung bình: 15 phút. Nên bật AI reply để giảm xuống dưới 1 phút.</p>
+                                    <button class="text-xs text-yellow-600 font-medium mt-2">Bật ngay →</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hot Products & Recommendations -->
+                <div class="bg-white rounded-xl shadow-sm">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">Sản phẩm hot & Đề xuất</h3>
+                        <p class="text-sm text-gray-600 mt-1">AI phân tích từ thị trường</p>
+                    </div>
+                    <div class="p-6">
+                        <!-- Trending Products -->
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-gray-700 mb-3">🔥 Đang hot trên thị trường</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=40&h=40&fit=crop" 
+                                             alt="Product" 
+                                             class="w-10 h-10 rounded-lg object-cover">
+                                        <div>
+                                            <p class="text-sm font-medium">Kem chống nắng tone up</p>
+                                            <p class="text-xs text-gray-500">Tăng 250% search</p>
+                                        </div>
+                                    </div>
+                                    <button class="text-xs text-purple-600 font-medium">Nhập hàng</button>
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=40&h=40&fit=crop" 
+                                             alt="Product" 
+                                             class="w-10 h-10 rounded-lg object-cover">
+                                        <div>
+                                            <p class="text-sm font-medium">Serum HA 2%</p>
+                                            <p class="text-xs text-gray-500">Tăng 180% search</p>
+                                        </div>
+                                    </div>
+                                    <button class="text-xs text-purple-600 font-medium">Nhập hàng</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Stock Recommendations -->
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-700 mb-3">📦 Đề xuất nhập hàng</h4>
+                            <div class="bg-purple-50 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-sm font-medium">Son môi A123</span>
+                                    <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Sắp hết</span>
+                                </div>
+                                <p class="text-xs text-gray-600 mb-3">Dự báo hết hàng trong 3 ngày. Đề xuất nhập thêm 200 cái.</p>
+                                <div class="chart-container" style="height: 80px;">
+                                    <canvas id="stockChart"></canvas>
+                                </div>
+                                <button class="w-full mt-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition">
+                                    Tạo đơn nhập hàng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Performance Stats -->
+            <div class="mt-8 bg-white rounded-xl p-6 shadow-sm">
+                <h3 class="text-lg font-semibold mb-6">Hiệu suất AI Assistant</h3>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div class="w-20 h-20 gradient-ai rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl font-bold text-white">98%</span>
+                        </div>
+                        <p class="text-sm font-medium">Độ chính xác</p>
+                        <p class="text-xs text-gray-500">+2% so với tuần trước</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 gradient-success rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl font-bold text-white">0.8s</span>
+                        </div>
+                        <p class="text-sm font-medium">Thời gian phản hồi</p>
+                        <p class="text-xs text-gray-500">Nhanh hơn 95%</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 gradient-warning rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl font-bold text-white">4.8★</span>
+                        </div>
+                        <p class="text-sm font-medium">Đánh giá từ khách</p>
+                        <p class="text-xs text-gray-500">156 reviews</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-20 h-20 gradient-primary rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl font-bold text-white">25%</span>
+                        </div>
+                        <p class="text-sm font-medium">Tăng conversion</p>
+                        <p class="text-xs text-gray-500">Nhờ AI support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-30">
+        <div class="grid grid-cols-5 gap-1">
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">Tổng quan</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs">Đơn hàng</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-box text-xl mb-1"></i>
+                <span class="text-xs">Sản phẩm</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-blue-600">
+                <i class="fas fa-robot text-xl mb-1"></i>
+                <span class="text-xs">AI</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">Tài khoản</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobileSidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Initialize Stock Chart
+        const stockCtx = document.getElementById('stockChart').getContext('2d');
+        const stockChart = new Chart(stockCtx, {
+            type: 'line',
+            data: {
+                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                datasets: [{
+                    label: 'Tồn kho',
+                    data: [150, 120, 95, 70, 45, 20, 5],
+                    borderColor: '#8B5CF6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        display: false
+                    },
+                    y: {
+                        display: false,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Copy template to clipboard
+        document.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const text = this.querySelector('.text-gray-800').textContent;
+                navigator.clipboard.writeText(text);
+                
+                // Show copied notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                notification.innerHTML = '<i class="fas fa-check mr-2"></i>Đã copy mẫu tin nhắn!';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 2000);
+            });
+        });
+
+        // Toggle switches
+        document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const label = this.closest('.ai-card').querySelector('h3').textContent;
+                console.log(`${label}: ${this.checked ? 'ON' : 'OFF'}`);
+            });
+        });
+
+        // Simulate AI loading
+        setInterval(() => {
+            const loadingDots = document.querySelector('.loading-dots');
+            if (loadingDots) {
+                // Simulate completion
+                setTimeout(() => {
+                    loadingDots.innerHTML = '<i class="fas fa-check text-green-500"></i>';
+                }, 3000);
+            }
+        }, 5000);
+
+        // Load animations
+        window.addEventListener('load', () => {
+            const cards = document.querySelectorAll('.ai-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.5s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+
+        // Typing effect for AI responses
+        function typeMessage(element, text, speed = 50) {
+            let i = 0;
+            element.textContent = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            
+            type();
+        }
+
+        // Example: Simulate AI generating response
+        function generateAIResponse() {
+            const responseArea = document.createElement('div');
+            responseArea.className = 'mt-4 p-4 bg-purple-50 rounded-lg';
+            responseArea.innerHTML = '<p class="text-sm text-gray-800"></p>';
+            
+            const text = "Dựa trên phân tích dữ liệu, tôi đề xuất bạn nên tập trung vào các sản phẩm skincare trong tháng này vì nhu cầu đang tăng cao.";
+            typeMessage(responseArea.querySelector('p'), text);
+        }
+    </script>
+</body>
+</html>

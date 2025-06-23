@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo & Thống kê - OmniSell</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        }
+        
+        .gradient-shopee {
+            background: linear-gradient(135deg, #F59E0B 0%, #EE4D2D 100%);
+        }
+        
+        .gradient-tiktok {
+            background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        }
+        
+        .gradient-facebook {
+            background: linear-gradient(135deg, #1877F2 0%, #0E5CC9 100%);
+        }
+        
+        /* Sidebar animations */
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            padding-left: 28px;
+        }
+        
+        .sidebar-item.active {
+            background-color: #EFF6FF;
+            border-left: 4px solid #3B82F6;
+            color: #3B82F6;
+        }
+        
+        /* Card animations */
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        /* Mobile menu animation */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+        
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+        
+        /* Period selector */
+        .period-selector {
+            transition: all 0.3s ease;
+        }
+        
+        .period-selector.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        
+        /* Export dropdown */
+        .export-dropdown {
+            transform: scale(0.95);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+        
+        .export-dropdown.show {
+            transform: scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Product rank animation */
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .product-rank {
+            animation: slideInRight 0.5s ease;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        
+        /* Loading skeleton */
+        @keyframes skeleton {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton 1.5s infinite;
+        }
+        
+        /* Notification badge */
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Trend indicator */
+        .trend-up {
+            color: #10B981;
+        }
+        
+        .trend-down {
+            color: #EF4444;
+        }
+        
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            .print-break {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm z-40 no-print">
+        <div class="flex items-center justify-between p-4">
+            <button onclick="toggleMobileMenu()" class="text-gray-700">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-sm"></i>
+                </div>
+                <span class="text-lg font-bold text-gray-900">OmniSell</span>
+            </div>
+            <button class="relative">
+                <i class="fas fa-bell text-gray-700 text-xl"></i>
+                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Desktop Sidebar -->
+    <aside class="hidden lg:block fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-30 no-print">
+        <div class="p-6">
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                    <i class="fas fa-store text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+            </div>
+            
+            <nav class="space-y-1"></nav>
+                <a href="dashboard.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="orders.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="products.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="chat.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="warehouse.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="ai-assistant.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="reports.html" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+            
+            <div class="mt-8 pt-8 border-t">
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-plug text-lg"></i>
+                    <span>Kết nối kênh</span>
+                </a>
+                <a href="#" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-cog text-lg"></i>
+                    <span>Cài đặt</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Sidebar -->
+    <aside id="mobileSidebar" class="lg:hidden fixed left-0 top-0 w-64 h-full bg-white shadow-lg z-50 mobile-menu no-print">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-store text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">OmniSell</span>
+                </div>
+                <button onclick="toggleMobileMenu()" class="text-gray-500">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-home text-lg"></i>
+                    <span>Tổng quan</span>
+                </a>
+                <a href="orders.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span>Đơn hàng</span>
+                    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">12</span>
+                </a>
+                <a href="products.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-box text-lg"></i>
+                    <span>Sản phẩm</span>
+                </a>
+                <a href="chat.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-comments text-lg"></i>
+                    <span>Tin nhắn</span>
+                    <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">5</span>
+                </a>
+                <a href="warehouse.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-warehouse text-lg"></i>
+                    <span>Kho hàng</span>
+                </a>
+                <a href="ai-assistant.html" class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-robot text-lg"></i>
+                    <span>AI Assistant</span>
+                </a>
+                <a href="reports.html" class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span>Báo cáo</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileOverlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 hidden no-print" onclick="toggleMobileMenu()"></div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 pt-16 lg:pt-0">
+        <!-- Top Navigation -->
+        <nav class="hidden lg:flex items-center justify-between bg-white px-8 py-4 shadow-sm no-print">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-semibold text-gray-900">Báo cáo & Thống kê</h1>
+                <select class="px-3 py-1 border border-gray-300 rounded-lg text-sm">
+                    <option>Tháng 6/2025</option>
+                    <option>Tháng 5/2025</option>
+                    <option>Tháng 4/2025</option>
+                    <option>Quý 2/2025</option>
+                    <option>Năm 2025</option>
+                </select>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button onclick="toggleExportDropdown()" class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        <i class="fas fa-download"></i>
+                        <span>Xuất báo cáo</span>
+                        <i class="fas fa-chevron-down text-sm"></i>
+                    </button>
+                    <div id="exportDropdown" class="export-dropdown absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border">
+                        <a href="#" onclick="exportToPDF()" class="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 transition">
+                            <i class="fas fa-file-pdf text-red-600"></i>
+                            <span>Xuất PDF</span>
+                        </a>
+                        <a href="#" onclick="exportToExcel()" class="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 transition">
+                            <i class="fas fa-file-excel text-green-600"></i>
+                            <span>Xuất Excel</span>
+                        </a>
+                        <a href="#" onclick="window.print()" class="flex items-center space-x-2 px-4 py-3 hover:bg-gray-50 transition">
+                            <i class="fas fa-print text-gray-600"></i>
+                            <span>In báo cáo</span>
+                        </a>
+                    </div>
+                </div>
+                <button class="relative p-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs notification-badge">3</span>
+                </button>
+                <div class="flex items-center space-x-3 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop" 
+                         alt="Avatar" 
+                         class="w-10 h-10 rounded-full">
+                    <div>
+                        <p class="font-medium text-gray-900">Nguyễn Văn A</p>
+                        <p class="text-xs text-gray-500">Admin</p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Analytics Content -->
+        <div class="p-4 lg:p-8">
+            <!-- Summary Stats -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="stat-card bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-dollar-sign text-white text-xl"></i>
+                        </div>
+                        <span class="text-sm text-green-600 font-medium">
+                            <i class="fas fa-arrow-up mr-1"></i>15%
+                        </span>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900">125.5M</h3>
+                    <p class="text-sm text-gray-600 mt-1">Tổng doanh thu</p>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 gradient-success rounded-lg flex items-center justify-center">
+                            <i class="fas fa-shopping-cart text-white text-xl"></i>
+                        </div>
+                        <span class="text-sm text-green-600 font-medium">
+                            <i class="fas fa-arrow-up mr-1"></i>8%
+                        </span>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900">3,456</h3>
+                    <p class="text-sm text-gray-600 mt-1">Tổng đơn hàng</p>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-chart-line text-white text-xl"></i>
+                        </div>
+                        <span class="text-sm text-red-600 font-medium">
+                            <i class="fas fa-arrow-down mr-1"></i>3%
+                        </span>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900">36.3k</h3>
+                    <p class="text-sm text-gray-600 mt-1">Giá trị TB/đơn</p>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <span class="text-sm text-green-600 font-medium">
+                            <i class="fas fa-arrow-up mr-1"></i>22%
+                        </span>
+                    </div>
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900">1,892</h3>
+                    <p class="text-sm text-gray-600 mt-1">Khách hàng mới</p>
+                </div>
+            </div>
+
+            <!-- Revenue Chart -->
+            <div class="bg-white rounded-xl p-4 lg:p-6 shadow-sm mb-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 lg:mb-0">Doanh thu theo thời gian</h2>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="updateRevenueChart('7days')" class="period-selector active px-3 py-1 text-sm font-medium rounded-lg transition">7 ngày</button>
+                        <button onclick="updateRevenueChart('30days')" class="period-selector px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">30 ngày</button>
+                        <button onclick="updateRevenueChart('3months')" class="period-selector px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">3 tháng</button>
+                        <button onclick="updateRevenueChart('12months')" class="period-selector px-3 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">12 tháng</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t">
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-gray-900">125.5M</p>
+                        <p class="text-sm text-gray-600">Tổng doanh thu</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-gray-900">4.2M</p>
+                        <p class="text-sm text-gray-600">TB/ngày</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-2xl font-bold text-green-600">+15%</p>
+                        <p class="text-sm text-gray-600">So với kỳ trước</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Channel Performance -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Channel Revenue Chart -->
+                <div class="bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-6">Doanh thu theo kênh</h2>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="channelChart"></canvas>
+                    </div>
+                    <div class="space-y-3 mt-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 rounded" style="background-color: #EE4D2D;"></div>
+                                <span class="text-sm">Shopee</span>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">52.8M</p>
+                                <p class="text-xs text-gray-500">42%</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 rounded" style="background-color: #1877F2;"></div>
+                                <span class="text-sm">Facebook</span>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">38.9M</p>
+                                <p class="text-xs text-gray-500">31%</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 rounded" style="background-color: #000000;"></div>
+                                <span class="text-sm">TikTok Shop</span>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">33.8M</p>
+                                <p class="text-xs text-gray-500">27%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Products -->
+                <div class="bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-lg font-semibold text-gray-900">Sản phẩm bán chạy</h2>
+                        <a href="#" class="text-sm text-blue-600 hover:text-blue-700">Xem tất cả</a>
+                    </div>
+                    <div class="space-y-4 max-h-96 overflow-y-auto">
+                        <!-- Product 1 -->
+                        <div class="product-rank flex items-center space-x-3" style="animation-delay: 0.1s;">
+                            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center font-bold text-yellow-600">
+                                1
+                            </div>
+                            <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=50&h=50&fit=crop" 
+                                 alt="Product" 
+                                 class="w-12 h-12 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-900">Son môi cao cấp A123</p>
+                                <p class="text-sm text-gray-500">856 đã bán</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">22.3M</p>
+                                <p class="text-xs text-green-600">+12%</p>
+                            </div>
+                        </div>
+
+                        <!-- Product 2 -->
+                        <div class="product-rank flex items-center space-x-3" style="animation-delay: 0.2s;">
+                            <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-600">
+                                2
+                            </div>
+                            <img src="https://images.unsplash.com/photo-1611080541599-8c6dbde6ed28?w=50&h=50&fit=crop" 
+                                 alt="Product" 
+                                 class="w-12 h-12 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-900">Kem dưỡng da B456</p>
+                                <p class="text-sm text-gray-500">642 đã bán</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">18.7M</p>
+                                <p class="text-xs text-green-600">+8%</p>
+                            </div>
+                        </div>
+
+                        <!-- Product 3 -->
+                        <div class="product-rank flex items-center space-x-3" style="animation-delay: 0.3s;">
+                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center font-bold text-orange-600">
+                                3
+                            </div>
+                            <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=50&h=50&fit=crop" 
+                                 alt="Product" 
+                                 class="w-12 h-12 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-900">Nước hoa hồng C789</p>
+                                <p class="text-sm text-gray-500">523 đã bán</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">15.2M</p>
+                                <p class="text-xs text-red-600">-3%</p>
+                            </div>
+                        </div>
+
+                        <!-- Product 4 -->
+                        <div class="product-rank flex items-center space-x-3" style="animation-delay: 0.4s;">
+                            <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-600">
+                                4
+                            </div>
+                            <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=50&h=50&fit=crop" 
+                                 alt="Product" 
+                                 class="w-12 h-12 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-900">Serum vitamin C</p>
+                                <p class="text-sm text-gray-500">489 đã bán</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">12.8M</p>
+                                <p class="text-xs text-green-600">+5%</p>
+                            </div>
+                        </div>
+
+                        <!-- Product 5 -->
+                        <div class="product-rank flex items-center space-x-3" style="animation-delay: 0.5s;">
+                            <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-600">
+                                5
+                            </div>
+                            <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=50&h=50&fit=crop" 
+                                 alt="Product" 
+                                 class="w-12 h-12 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-900">Kem chống nắng SPF50</p>
+                                <p class="text-sm text-gray-500">412 đã bán</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-semibold">10.3M</p>
+                                <p class="text-xs text-green-600">+18%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Metrics -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Customer Metrics -->
+                <div class="bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Khách hàng</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Khách mới</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold">1,892</span>
+                                <span class="text-xs text-green-600">+22%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Khách quay lại</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold">3,124</span>
+                                <span class="text-xs text-green-600">+8%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Tỷ lệ quay lại</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold">62.3%</span>
+                                <span class="text-xs text-red-600">-2%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">CLV trung bình</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold">1.2M</span>
+                                <span class="text-xs text-green-600">+15%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Metrics -->
+                <div class="bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Đơn hàng</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Tỷ lệ chuyển đổi</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold">3.8%</span>
+                                <span class="text-xs text-green-600">+0.5%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Tỷ lệ hủy đơn</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold">5.2%</span>
+                                <span class="text-xs text-red-600">+1.2%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Thời gian xử lý TB</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold">2.4h</span>
+                                <span class="text-xs text-green-600">-15m</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Đánh giá TB</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold">4.7★</span>
+                                <span class="text-xs text-green-600">+0.1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Channel Performance Summary -->
+                <div class="bg-white rounded-xl p-4 lg:p-6 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Hiệu suất kênh</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fab fa-shopify text-orange-600"></i>
+                                    <span class="text-sm">Shopee</span>
+                                </div>
+                                <span class="text-sm font-semibold">52.8M</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="gradient-shopee h-2 rounded-full" style="width: 42%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fab fa-facebook text-blue-600"></i>
+                                    <span class="text-sm">Facebook</span>
+                                </div>
+                                <span class="text-sm font-semibold">38.9M</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="gradient-facebook h-2 rounded-full" style="width: 31%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fab fa-tiktok"></i>
+                                    <span class="text-sm">TikTok</span>
+                                </div>
+                                <span class="text-sm font-semibold">33.8M</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="gradient-tiktok h-2 rounded-full" style="width: 27%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-30 no-print">
+        <div class="grid grid-cols-5 gap-1">
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">Tổng quan</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs">Đơn hàng</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-box text-xl mb-1"></i>
+                <span class="text-xs">Sản phẩm</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-blue-600">
+                <i class="fas fa-chart-line text-xl mb-1"></i>
+                <span class="text-xs">Báo cáo</span>
+            </a>
+            <a href="#" class="flex flex-col items-center justify-center py-2 text-gray-600">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">Tài khoản</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Export Button - Mobile -->
+    <button onclick="toggleExportDropdown()" class="lg:hidden fixed bottom-20 right-4 w-14 h-14 gradient-primary text-white rounded-full shadow-lg hover:shadow-xl transition z-30 no-print">
+        <i class="fas fa-download"></i>
+    </button>
+
+    <script>
+        // Toggle Mobile Menu
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobileSidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Toggle Export Dropdown
+        function toggleExportDropdown() {
+            const dropdown = document.getElementById('exportDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Revenue Chart Data
+        const revenueData = {
+            '7days': {
+                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                shopee: [3.2, 4.1, 3.8, 5.2, 6.8, 8.5, 7.2],
+                tiktok: [2.1, 2.8, 3.2, 3.9, 4.5, 5.2, 4.8],
+                facebook: [2.5, 3.2, 2.9, 4.1, 5.2, 6.1, 5.5]
+            },
+            '30days': {
+                labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
+                shopee: [28.5, 32.1, 30.8, 35.2],
+                tiktok: [18.2, 22.5, 24.1, 26.8],
+                facebook: [22.1, 25.3, 24.8, 28.5]
+            },
+            '3months': {
+                labels: ['Tháng 4', 'Tháng 5', 'Tháng 6'],
+                shopee: [48.2, 51.3, 52.8],
+                tiktok: [28.5, 31.2, 33.8],
+                facebook: [35.1, 37.2, 38.9]
+            },
+            '12months': {
+                labels: ['T7/24', 'T8/24', 'T9/24', 'T10/24', 'T11/24', 'T12/24', 'T1/25', 'T2/25', 'T3/25', 'T4/25', 'T5/25', 'T6/25'],
+                shopee: [38.2, 41.3, 42.8, 45.2, 48.5, 51.2, 48.9, 50.2, 51.8, 52.1, 52.5, 52.8],
+                tiktok: [15.2, 18.3, 21.5, 23.8, 25.2, 28.1, 29.5, 30.8, 31.9, 32.5, 33.2, 33.8],
+                facebook: [25.1, 27.2, 28.5, 30.2, 32.5, 34.8, 35.9, 36.8, 37.5, 38.1, 38.5, 38.9]
+            }
+        };
+
+        // Initialize Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: revenueData['7days'].labels,
+                datasets: [
+                    {
+                        label: 'Shopee',
+                        data: revenueData['7days'].shopee,
+                        borderColor: '#EE4D2D',
+                        backgroundColor: 'rgba(238, 77, 45, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#EE4D2D',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'TikTok Shop',
+                        data: revenueData['7days'].tiktok,
+                        borderColor: '#000000',
+                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#000000',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Facebook',
+                        data: revenueData['7days'].facebook,
+                        borderColor: '#1877F2',
+                        backgroundColor: 'rgba(24, 119, 242, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#1877F2',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y + 'M VNĐ';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            borderDash: [5, 5],
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            },
+                            callback: function(value) {
+                                return value + 'M';
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+
+        // Initialize Channel Chart
+        const channelCtx = document.getElementById('channelChart').getContext('2d');
+        const channelChart = new Chart(channelCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Shopee', 'Facebook', 'TikTok Shop'],
+                datasets: [{
+                    data: [52.8, 38.9, 33.8],
+                    backgroundColor: ['#EE4D2D', '#1877F2', '#000000'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.parsed + 'M VNĐ';
+                            }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+
+        // Update Revenue Chart
+        function updateRevenueChart(period) {
+            // Update button states
+            document.querySelectorAll('.period-selector').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-gray-600', 'hover:bg-gray-100');
+            });
+            event.target.classList.add('active');
+            event.target.classList.remove('text-gray-600', 'hover:bg-gray-100');
+
+            // Update chart data
+            const data = revenueData[period];
+            revenueChart.data.labels = data.labels;
+            revenueChart.data.datasets[0].data = data.shopee;
+            revenueChart.data.datasets[1].data = data.tiktok;
+            revenueChart.data.datasets[2].data = data.facebook;
+            revenueChart.update();
+        }
+
+        // Export functions
+        function exportToPDF() {
+            console.log('Exporting to PDF...');
+            alert('Đang xuất file PDF...');
+        }
+
+        function exportToExcel() {
+            console.log('Exporting to Excel...');
+            alert('Đang xuất file Excel...');
+        }
+
+        // Click outside to close dropdown
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.relative')) {
+                document.getElementById('exportDropdown').classList.remove('show');
+            }
+        });
+
+        // Load animations
+        window.addEventListener('load', () => {
+            // Animate stat cards
+            const cards = document.querySelectorAll('.stat-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.5s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
