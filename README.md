@@ -24,6 +24,14 @@
 
 ## 🛠️ Cài đặt & Chạy dự án
 
+### Version
+
+```bash
+node: 22.11.0
+nextjs: 15.3.4
+nestjs: 11.0.1
+```
+
 ```bash
 # Clone repo
 git clone git@github.com:aizen-team/omnisell.git

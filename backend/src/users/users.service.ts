@@ -39,7 +39,7 @@ export class UsersService {
   // Get all users with pagination
   async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<User>> {
     const page = paginationQuery.page ?? 1;
-const limit = paginationQuery.limit ?? 10;
+    const limit = paginationQuery.limit ?? 10;
     const skip = (page - 1) * limit;
 
     const [users, total] = await this.userRepository.findAndCount({
