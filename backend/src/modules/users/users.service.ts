@@ -2,12 +2,12 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
-import { CreateUserDto } from '../dto/user/create-user.dto';
-import { UpdateUserDto } from '../dto/user/update-user.dto';
-import { PaginationQueryDto } from '../dto/common/pagination-query.dto';
-import { PaginatedResponseDto } from '../dto/common/pagination-response.dto';
-import { UserRole } from '../entities/user.entity';
+import { User } from '@/entities/user.entity';
+import { CreateUserDto } from '@/dto/user/create-user.dto';
+import { UpdateUserDto } from '@/dto/user/update-user.dto';
+import { PaginationQueryDto } from '@/dto/common/pagination-query.dto';
+import { PaginatedResponseDto } from '@/dto/common/pagination-response.dto';
+import { UserRole } from '@/entities/user.entity';
 
 @Injectable()
 export class UsersService {

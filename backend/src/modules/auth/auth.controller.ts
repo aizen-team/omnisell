@@ -1,10 +1,10 @@
 // src/auth/auth.controller.ts
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
-import { RegisterDto } from '../dto/auth/register.dto';
-import { LoginDto } from '../dto/auth/login.dto';
-import { AuthResponseDto } from '../dto/auth/auth-response.dto';
+import { AuthService } from '@/modules/auth/auth.service';
+import { RegisterDto } from '@/dto/auth/register.dto';
+import { LoginDto } from '@/dto/auth/login.dto';
+import { AuthResponseDto } from '@/dto/auth/auth-response.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')

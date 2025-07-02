@@ -21,12 +21,12 @@ import {
     ApiBody,
   } from '@nestjs/swagger';
   import { UsersService } from './users.service';
-  import { CreateUserDto } from '../dto/user/create-user.dto';
-  import { UpdateUserDto } from '../dto/user/update-user.dto';
-  import { PaginationQueryDto } from '../dto/common/pagination-query.dto';
-  import { PaginatedResponseDto } from '../dto/common/pagination-response.dto';
-  import { User } from '../entities/user.entity';
-  import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+  import { CreateUserDto } from '@/dto/user/create-user.dto';
+  import { UpdateUserDto } from '@/dto/user/update-user.dto';
+  import { PaginationQueryDto } from '@/dto/common/pagination-query.dto';
+  import { PaginatedResponseDto } from '@/dto/common/pagination-response.dto';
+  import { User } from '@/entities/user.entity';
+  import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
   
   @ApiTags('Users')
   @ApiBearerAuth()

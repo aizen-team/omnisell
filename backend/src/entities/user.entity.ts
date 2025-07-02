@@ -16,6 +16,12 @@ import {
     ADMIN = 'admin',
     USER = 'user',
   }
+
+  export enum AccountType {
+    local = 'LOCAL',
+    google = 'GOOGLE',
+    facebook = 'FACEBOOK',
+  }
   
   @Entity('users')
   export class User {
@@ -67,12 +73,24 @@ import {
       default: UserRole.USER,
     })
     role: UserRole;
+
+    @ApiProperty({
+      description: 'User account type',
+      enum: AccountType,
+      example: AccountType.local,
+    })
+    @Column({
+      type: 'enum',
+      enum: AccountType,
+      default: AccountType.local,
+    })
+    account_type: AccountType;  
   
     @ApiProperty({
       description: 'User account status',
-      example: true,
+      example: false,
     })
-    @Column({ type: 'boolean', default: true })
+    @Column({ type: 'boolean', default: false })
     is_active: boolean;
   
     @ApiProperty({

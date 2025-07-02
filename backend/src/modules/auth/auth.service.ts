@@ -1,11 +1,11 @@
 // src/auth/auth.service.ts
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
-import { RegisterDto } from '../dto/auth/register.dto';
-import { LoginDto } from '../dto/auth/login.dto';
-import { AuthResponseDto } from '../dto/auth/auth-response.dto';
-import { User } from '../entities/user.entity';
+import { UsersService } from '@/modules/users/users.service';
+import { RegisterDto } from '@/dto/auth/register.dto';
+import { LoginDto } from '@/dto/auth/login.dto';
+import { AuthResponseDto } from '@/dto/auth/auth-response.dto';
+import { User } from '@/entities/user.entity';
 
 @Injectable()
 export class AuthService {
