@@ -27,9 +27,10 @@ import {
   import { PaginatedResponseDto } from '@/dto/common/pagination-response.dto';
   import { User } from '@/entities/user.entity';
   import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
+  import { RolesGuard } from '@/modules/auth/guards/roles.guard';
   
   @ApiTags('Users')
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Controller('users')
   export class UsersController {
@@ -59,6 +60,7 @@ import {
       description: 'Conflict - User with email already exists',
     })
     async create(@Body() createUserDto: CreateUserDto): Promise<User> {
+      console.log('>> TEST creste');
       return this.usersService.create(createUserDto);
     }
   

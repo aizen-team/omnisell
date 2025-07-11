@@ -18,9 +18,9 @@ import {
   }
 
   export enum AccountType {
-    local = 'LOCAL',
-    google = 'GOOGLE',
-    facebook = 'FACEBOOK',
+    LOCAL = 'local',
+    GOOGLE = 'google',
+    FACEBOOK = 'facebook',
   }
   
   @Entity('users')
@@ -77,12 +77,12 @@ import {
     @ApiProperty({
       description: 'User account type',
       enum: AccountType,
-      example: AccountType.local,
+      example: AccountType.LOCAL,
     })
     @Column({
       type: 'enum',
       enum: AccountType,
-      default: AccountType.local,
+      default: AccountType.LOCAL,
     })
     account_type: AccountType;  
   
