@@ -1,0 +1,19 @@
+/* app */
+@use "./fonts.scss";
+@use "./global.scss";
+@use "./variables.scss";
+
+/* layouts */
+@use "./layouts/dashboard.scss";
+
+/* pages */
+@use "./pages/login.scss";
+
+/* components */
+/* -- ui */
+@use "./components/ui/button.scss";
+
+/* ---- loaders */
+@use "./components/ui/loaders/dot-wave-loader.scss";
+
+@import "../css/tailwind.css";

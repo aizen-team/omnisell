@@ -1,0 +1,80 @@
+/* styles/button.scss */
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+    outline: none;
+    cursor: pointer;
+
+    &.button-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &.button-primary {
+        flex: 1;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        color: #ffffff;
+        transition: all 0.2s ease;
+        background: linear-gradient(
+            to right,
+            #2563eb,
+            #1d4ed8
+        );
+
+        &:hover:not(.button-disabled) {
+            background-color: #1d4ed8;
+        }
+    }
+
+    &.button-secondary {
+        background-color: #4b5563;
+        color: #fff;
+
+        &:hover:not(.button-disabled) {
+            background-color: #374151;
+        }
+    }
+
+    &.button-outline {
+        border: 1px solid #9ca3af;
+        color: #1f2937;
+
+        &:hover:not(.button-disabled) {
+            background-color: #f3f4f6;
+        }
+    }
+
+    &.button-danger {
+        background-color: #dc2626;
+        color: white;
+
+        &:hover:not(.button-disabled) {
+            background-color: #b91c1c;
+        }
+    }
+
+    &.button-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    &.button-md {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+
+    &.button-lg {
+        padding: 0.75rem 1.25rem;
+        font-size: 1.125rem;
+    }
+
+    .label {
+        margin: 0 0.5rem;
+    }
+}
