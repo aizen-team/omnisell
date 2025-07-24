@@ -1,0 +1,65 @@
+.dot-wave-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+
+    &.full-screen {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.6);
+        z-index: 9999;
+    }
+
+    &.inline {
+        height: auto;
+    }
+
+    .dot-wave {
+        display: flex;
+        gap: 8px;
+        height: 30px;
+
+        span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: dotWave 1s infinite ease-in-out;
+        }
+
+        span:nth-child(1) {
+            background-color: #e74c3c; // đỏ
+            animation-delay: 0s;
+        }
+
+        span:nth-child(2) {
+            background-color: #e67e22; // cam
+            animation-delay: 0.1s;
+        }
+
+        span:nth-child(3) {
+            background-color: #f1c40f; // vàng
+            animation-delay: 0.2s;
+        }
+
+        span:nth-child(4) {
+            background-color: #2ecc71; // xanh lá
+            animation-delay: 0.3s;
+        }
+
+        span:nth-child(5) {
+            background-color: #3498db; // xanh dương
+            animation-delay: 0.4s;
+        }
+    }
+}
+
+@keyframes dotWave {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
