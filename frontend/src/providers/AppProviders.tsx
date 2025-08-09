@@ -7,9 +7,7 @@ import { LayoutProps } from "@/types/app";
 
 interface Props extends LayoutProps {}
 
-export default function AppProviders({
-    children,
-}: Props) {
+export default function AppProviders({ children }: Props) {
     return (
         <AppProvider>
             <Provider store={store}>{children}</Provider>

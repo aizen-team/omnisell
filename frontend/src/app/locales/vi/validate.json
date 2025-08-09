@@ -1,0 +1,51 @@
+{
+    "common": {
+        "required": "Trường này là bắt buộc.",
+        "invalid": "Giá trị không hợp lệ.",
+        "min": "Tối thiểu {min} ký tự.",
+        "max": "Tối đa {max} ký tự.",
+        "between": "Phải từ {min} đến {max} ký tự.",
+        "boolean": "Phải là true hoặc false.",
+        "confirmed": "Không khớp với {target}.",
+        "in": "Giá trị không nằm trong danh sách hợp lệ.",
+        "not_in": "Giá trị không được phép.",
+        "regex": "Không đúng định dạng yêu cầu.",
+        "unique": "Đã được sử dụng.",
+        "exists": "Không tồn tại trong hệ thống."
+    },
+    "string": {
+        "email": "Email không hợp lệ.",
+        "url": "URL không đúng định dạng.",
+        "alpha": "Chỉ được chứa ký tự chữ.",
+        "alpha_num": "Chỉ được chứa ký tự chữ và số.",
+        "password_weak": "Mật khẩu phải có ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt."
+    },
+    "number": {
+        "numeric": "Phải là số.",
+        "integer": "Phải là số nguyên.",
+        "min_value": "Giá trị tối thiểu là {min}.",
+        "max_value": "Giá trị tối đa là {max}.",
+        "digits": "Phải gồm đúng {length} chữ số."
+    },
+    "date": {
+        "date": "Không đúng định dạng ngày.",
+        "before": "Phải trước ngày {date}.",
+        "after": "Phải sau ngày {date}."
+    },
+    "fields": {
+        "email": {
+            "required": "Email là bắt buộc.",
+            "invalid": "Email không hợp lệ."
+        },
+        "password": {
+            "required": "Mật khẩu là bắt buộc.",
+            "min": "Mật khẩu tối thiểu {min} ký tự.",
+            "confirmed": "Mật khẩu xác nhận không khớp."
+        },
+        "username": {
+            "required": "Tên người dùng là bắt buộc.",
+            "min": "Tên người dùng phải từ {min} ký tự.",
+            "max": "Tên người dùng không được quá {max} ký tự."
+        }
+    }
+}

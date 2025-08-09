@@ -9,6 +9,8 @@ export interface User {
     email: string;
     password: string;
     phone_number: string;
+    remember?: boolean;
 }
 
-export interface LoginPayload extends Pick<User, "email" | "password">{}
+export interface LoginPayload
+    extends Pick<User, "email" | "password" | "remember"> {}

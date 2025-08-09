@@ -1,5 +1,4 @@
-import TextInput from "@/components/elements/TextInput";
 import Button from "@/components/elements/Button";
-import CheckboxInput from "@/components/elements/CheckboxInput";
+import Badge from "@/components/elements/Badge";
 
-export { TextInput, Button, CheckboxInput };
+export { Button, Badge };

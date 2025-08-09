@@ -8,3 +8,15 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
+
+* {
+    &::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 50px;
+        border: 5px solid #dddddd;
+        margin: 0;
+    }
+}
