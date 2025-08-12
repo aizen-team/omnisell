@@ -1,0 +1,46 @@
+{
+    "fields": {
+        "email": {
+            "label": "Email",
+            "placeholder": "name@company.com",
+            "description": "Chúng tôi sẽ không chia sẻ email của bạn cho bất kỳ ai."
+        },
+        "password": {
+            "label": "Mật khẩu",
+            "placeholder": "••••••••",
+            "description": "Mật khẩu phải có ít nhất 8 ký tự."
+        },
+        "confirmPassword": {
+            "label": "Xác nhận mật khẩu",
+            "placeholder": "••••••••"
+        },
+        "name": {
+            "label": "Họ và tên",
+            "placeholder": "Nhập họ và tên đầy đủ"
+        },
+        "first_name": {
+            "label": "Họ",
+            "placeholder": "Nguyễn"
+        },
+        "last_name": {
+            "label": "Tên",
+            "placeholder": "Văn A"
+        },
+        "username": {
+            "label": "Tên người dùng",
+            "placeholder": "Nhập tên người dùng"
+        },
+        "phone": {
+            "label": "Số điện thoại",
+            "placeholder": "Nhập số điện thoại"
+        },
+        "newPassword": {
+            "label": "Mật khẩu mới",
+            "placeholder": "Nhập mật khẩu mới"
+        },
+        "search": {
+            "label": "Tìm kiếm",
+            "placeholder": "Nhập từ khóa tìm kiếm..."
+        }
+    }
+}

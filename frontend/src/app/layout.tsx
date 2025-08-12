@@ -1,8 +1,15 @@
-import RootLayout from "@/layouts/RootLayout/RootLayout";
+import RootLayout from "@/layouts/RootLayout";
 import { LayoutProps } from "@/types/app";
+import { Metadata } from "next";
 
-interface Props extends LayoutProps {}
+interface Props extends LayoutProps {
+    params: { locale: string };
+}
 
-export default function AppLayout({ children }: Props) {
-    return <RootLayout>{children}</RootLayout>;
+export const metadata: Metadata = {
+    title: "Omnisel",
+};
+
+export default function AppLayout({ children, params }: Props) {
+    return <RootLayout params={params}>{children}</RootLayout>;
 }

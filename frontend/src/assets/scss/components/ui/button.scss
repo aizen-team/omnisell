@@ -9,11 +9,7 @@
     transition: all 0.2s;
     outline: none;
     cursor: pointer;
-
-    &.button-disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+    position: relative;
 
     &.button-primary {
         flex: 1;
@@ -21,11 +17,7 @@
         font-weight: 500;
         color: #ffffff;
         transition: all 0.2s ease;
-        background: linear-gradient(
-            to right,
-            #2563eb,
-            #1d4ed8
-        );
+        background: linear-gradient(to right, #2563eb, #1d4ed8);
 
         &:hover:not(.button-disabled) {
             background-color: #1d4ed8;
@@ -76,5 +68,10 @@
 
     .label {
         margin: 0 0.5rem;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }

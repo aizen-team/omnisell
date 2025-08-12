@@ -1,0 +1,78 @@
+{
+    "name": "OmniSell",
+    "navigation": {
+        "home": "Trang chủ",
+        "dashboard": "Tổng quan",
+        "orders": "Đơn hàng",
+        "products": "Sản phẩm",
+        "chats": "Tin nhắn",
+        "warehouse": "Kho hàng",
+        "aiAssistant": "AI Assistant",
+        "reports": "Báo cáo",
+        "connections": "Kết nối kênh",
+        "settings": "Cài đặt",
+        "profile": "Hồ sơ",
+        "logout": "Đăng xuất",
+        "login": "Đăng nhập",
+        "register": "Đăng ký",
+        "notifications": "Thông báo",
+        "support": "Hỗ trợ"
+    },
+    "buttons": {
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "confirm": "Xác nhận",
+        "back": "Quay lại",
+        "next": "Tiếp theo",
+        "submit": "Gửi",
+        "search": "Tìm kiếm",
+        "filter": "Lọc",
+        "upload": "Tải lên",
+        "close": "Đóng"
+    },
+    "messages": {
+        "loading": "Đang tải...",
+        "noData": "Không có dữ liệu.",
+        "error": "Đã xảy ra lỗi. Vui lòng thử lại.",
+        "success": "Thao tác thành công.",
+        "saved": "Đã lưu thành công.",
+        "deleted": "Đã xóa thành công.",
+        "updated": "Cập nhật thành công.",
+        "confirmDelete": "Bạn có chắc muốn xóa mục này?",
+        "unauthorized": "Bạn không có quyền truy cập chức năng này."
+    },
+    "statuses": {
+        "active": "Đang hoạt động",
+        "inactive": "Không hoạt động",
+        "pending": "Đang chờ",
+        "completed": "Hoàn tất",
+        "cancelled": "Đã hủy"
+    },
+    "languages": {
+        "vi": "Tiếng Việt",
+        "en": "Tiếng Anh"
+    },
+    "systemPages": {
+        "notFound": {
+            "title": "Không tìm thấy trang",
+            "description": "Trang bạn tìm kiếm không tồn tại hoặc đã bị xóa.",
+            "action": "Quay về trang chủ"
+        },
+        "serverError": {
+            "title": "Lỗi máy chủ",
+            "description": "Đã xảy ra lỗi từ phía máy chủ. Vui lòng thử lại sau.",
+            "action": "Thử lại"
+        },
+        "unauthorized": {
+            "title": "Không có quyền truy cập",
+            "description": "Bạn không có quyền truy cập vào trang này. Vui lòng kiểm tra quyền hoặc đăng nhập tài khoản khác.",
+            "action": "Về trang chủ"
+        },
+        "emptyList": {
+            "title": "Danh sách trống",
+            "description": "Chưa có dữ liệu nào được tạo. Hãy bắt đầu thêm mới."
+        }
+    }
+}

@@ -13,7 +13,12 @@
 /* -- ui */
 @use "./components/ui/button.scss";
 
+/* fields */
+@use "./components/ui/fields/text-field.scss";
+
 /* ---- loaders */
 @use "./components/ui/loaders/dot-wave-loader.scss";
+@use "./components/ui/loaders/dot-rotate-loader.scss";
+@use "./components/ui/loaders/fading-dot-loader.scss";
 
 @import "../css/tailwind.css";

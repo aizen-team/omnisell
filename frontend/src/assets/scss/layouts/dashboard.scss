@@ -1,0 +1,9 @@
+#sidebar {
+    .sidebar-item {
+        &:hover {
+            .item-icon {
+                margin-left: 1rem;
+            }
+        }
+    }
+}
